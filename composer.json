@@ -1,0 +1,42 @@
+{
+    "name":"liyuze/parameter-validator",
+    "description": "参数和变量的数据类型和格式验证。",
+    "homepage": "https://github.com/liyuze/parameter-validator",
+    "type": "library",
+    "keywords": [
+        "php",
+        "parameter",
+        "variable",
+        "validator",
+        "validate",
+        "参数验证",
+        "变量验证"
+    ],
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "li yuze",
+            "email": "290315384@qq.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "liyuze\\validator\\tests\\": "tests"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "liyuze\\validator\\": "src"
+        }
+    },
+    "repositories": {
+        "packagist": {
+            "type": "composer",
+            "url": "https://packagist.phpcomposer.com"
+        }
+    }
+}
