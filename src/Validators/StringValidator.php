@@ -37,9 +37,9 @@ class StringValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是一个字符串';
-        $this->messageMinLength == '' && $this->messageMinLength = '{param_name}的字符串长度不能小于{min}';
-        $this->messageMaxLength == '' && $this->messageMaxLength = '{param_name}的字符串长度不能大于{max}';
+        $this->message == '' && $this->message = '{param_name}不是一个字符串。';
+        $this->messageMinLength == '' && $this->messageMinLength = '{param_name}的字符串长度不能小于{min}。';
+        $this->messageMaxLength == '' && $this->messageMaxLength = '{param_name}的字符串长度不能大于{max}。';
     }
 
     /**

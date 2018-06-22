@@ -31,11 +31,11 @@ class ImageValidator extends FileValidator
 
         self::$_allMimeTypes = require __DIR__.'mimeTypes.php';
 
-        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}不是一张图片文件';
-        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}图片宽度不能小于{min_width}';
-        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}图片宽度不能超过{max_width}';
-        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}图片高度不都小于{min_height}';
-        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}图片高度不能超过{max_height}';
+        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}不是一张图片文件。';
+        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}图片宽度不能小于{min_width}。';
+        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}图片宽度不能超过{max_width}。';
+        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}图片高度不都小于{min_height}。';
+        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}图片高度不能超过{max_height}。';
     }
 
     /**

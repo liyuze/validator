@@ -46,7 +46,7 @@ class InValidator extends Validator
         if ($this->_range === null)
             throw new InvalidConfigException('The "range" property must be set.');
 
-        $this->message == '' && $this->message = '{param_name}的值是无效的';
+        $this->message == '' && $this->message = '{param_name}的值是无效的。';
     }
 
     /**

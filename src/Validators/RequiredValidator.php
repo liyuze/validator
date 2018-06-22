@@ -25,7 +25,7 @@ class RequiredValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不能为空';
+        $this->message == '' && $this->message = '{param_name}不能为空。';
     }
 
     /**

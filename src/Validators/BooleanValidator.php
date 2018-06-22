@@ -35,7 +35,7 @@ class BooleanValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}必须是布尔类型';
+        $this->message == '' && $this->message = '{param_name}必须是 "{true}" 或 "{false}"。';
     }
 
     /**
@@ -54,7 +54,10 @@ class BooleanValidator extends Validator
         }
 
         if (!$valid) {
-            $this->addError($parameter, $this->message);
+            $this->addError($parameter, $this->message, [
+                'true' => $this->trueValue === true ? 'true' : $this->trueValue,
+                'false' => $this->falseValue === false ? 'false' : $this->falseValue,
+            ]);
         }
 
         return true;
@@ -74,7 +77,10 @@ class BooleanValidator extends Validator
         }
 
         if (!$valid) {
-            return $this->message;
+            return [$this->message, [
+                'true' => $this->trueValue === true ? 'true' : $this->trueValue,
+                'false' => $this->falseValue === false ? 'false' : $this->falseValue,
+                ]];
         }
 
         return true;

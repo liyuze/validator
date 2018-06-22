@@ -52,10 +52,10 @@ class NumberValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = $this->mustInt ? '{param_name}必须是整数' : '{param_name}必须是数字';
-        $this->messageMin == '' && $this->messageMin = '{param_name}不能小于{min}';
-        $this->messageMax == '' && $this->messageMax = '{param_name}不能大于{max}';
-        $this->messageEqual == '' && $this->messageEqual = '{param_name}必须等于{equal}';
+        $this->message == '' && $this->message = $this->mustInt ? '{param_name}必须是整数。' : '{param_name}必须是数字。';
+        $this->messageMin == '' && $this->messageMin = '{param_name}不能小于{min}。';
+        $this->messageMax == '' && $this->messageMax = '{param_name}不能大于{max}。';
+        $this->messageEqual == '' && $this->messageEqual = '{param_name}必须等于{equal}。';
     }
 
     /**

@@ -50,19 +50,19 @@ class TemFileValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是上传文件';
-        $this->messageMinSize == '' && $this->messageMinSize = '{param_name}{file_name}文件大小不能低于{min_size}';
-        $this->messageMaxSize == '' && $this->messageMaxSize = '{param_name}{file_name}文件大小不能超过{max_size}';
-        $this->messageExtensions == '' && $this->messageExtensions  = '{param_name}{file_name}文件只支持以下后缀名：{extensions}';
-        $this->messageMimeTypes == '' && $this->messageMimeTypes  = '{param_name}{file_name}文件只支持以下MIME类型：{mime_types}';
-        $this->messageMinFiles == '' && $this->messageMinFiles = '{param_name}最少上传{min_files}个文件';
-        $this->messageMaxFiles == '' && $this->messageMaxFiles = '{param_name}最多上传{max_files}个文件';
-        $this->messageUploadError == '' && $this->messageUploadError = '{param_name}{file_name}上传错误,错误代码：{error_code}';
-        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}{file_name}不是一张图片文件';
-        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}图片{file_name}的宽度不能小于{min_width}';
-        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}图片{file_name}的宽度不能超过{max_width}';
-        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}图片{file_name}的高度不都小于{min_height}';
-        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}图片{file_name}的高度不能超过{max_height}';
+        $this->message == '' && $this->message = '{param_name}不是上传文件。';
+        $this->messageMinSize == '' && $this->messageMinSize = '{param_name}{file_name}文件大小不能低于{min_size}。';
+        $this->messageMaxSize == '' && $this->messageMaxSize = '{param_name}{file_name}文件大小不能超过{max_size}。';
+        $this->messageExtensions == '' && $this->messageExtensions  = '{param_name}{file_name}文件只支持以下后缀名：{extensions}。';
+        $this->messageMimeTypes == '' && $this->messageMimeTypes  = '{param_name}{file_name}文件只支持以下MIME类型：{mime_types}。';
+        $this->messageMinFiles == '' && $this->messageMinFiles = '{param_name}最少上传{min_files}个文件。';
+        $this->messageMaxFiles == '' && $this->messageMaxFiles = '{param_name}最多上传{max_files}个文件。';
+        $this->messageUploadError == '' && $this->messageUploadError = '{param_name}{file_name}上传错误,错误代码：{error_code}。';
+        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}{file_name}不是一张图片文件。';
+        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}图片{file_name}的宽度不能小于{min_width}。';
+        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}图片{file_name}的宽度不能超过{max_width}。';
+        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}图片{file_name}的高度不都小于{min_height}。';
+        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}图片{file_name}的高度不能超过{max_height}。';
 
         $this->init();
     }

@@ -167,6 +167,7 @@ abstract class Validator
 
             return false;
         }
+        $error = '';
         return true;
     }
 

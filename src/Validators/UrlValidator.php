@@ -38,7 +38,7 @@ class UrlValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是有效的URL.';
+        $this->message == '' && $this->message = '{param_name}不是有效的URL。';
     }
 
     /**

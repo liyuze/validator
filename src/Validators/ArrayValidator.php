@@ -13,13 +13,13 @@ class ArrayValidator extends Validator
 
     /**
      * @var string|array 验证key验证器配置
-     * 配置信息查看 [[\liyuze\Parameters\Parameters\parseValidatorConfig()]] 说明
+     * @see 配置信息查看 [[\liyuze\validator\Parameters::parseValidatorConfig()]] 说明
      */
     public $keyValidateConfig;
 
     /**
      * @var string|array 验证value验证器配置
-     * 配置信息查看 [[\liyuze\Parameters\Parameters\parseValidatorConfig()]] 说明
+     * @see 配置信息查看 [[\liyuze\validator\Parameters::parseValidatorConfig()]] 说明
      */
     public $valueValidateConfig;
 
@@ -50,9 +50,9 @@ class ArrayValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}必须是数组类型';
-        $this->messageKey == '' && $this->messageKey = '{param_name}的key值的格式不正确';
-        $this->messageValue == '' && $this->messageValue = '{param_name}的value值的格式不正确';
+        $this->message == '' && $this->message = '{param_name}必须是数组类型。';
+        $this->messageKey == '' && $this->messageKey = '{param_name}的key值的格式不正确。';
+        $this->messageValue == '' && $this->messageValue = '{param_name}的value值的格式不正确。';
     }
 
     /**

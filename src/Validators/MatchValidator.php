@@ -41,7 +41,7 @@ class MatchValidator extends Validator
         if ($this->pattern === null)
             throw new InvalidConfigException('The "pattern" property must be set.');
 
-        $this->message == '' && $this->message = '{param_name}的值是无效的';
+        $this->message == '' && $this->message = '{param_name}的值是无效的。';
     }
 
     /**

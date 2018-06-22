@@ -146,21 +146,21 @@ class CompareValidator extends Validator
     {
         switch ($operator) {
             case '==':
-                return '{param_name}必须等于{value_or_param_name}';
+                return '{param_name}必须等于{value_or_param_name}。';
             case '===':
-                return '{param_name}必须等于{value_or_param_name}';
+                return '{param_name}必须等于{value_or_param_name}。';
             case '!=':
-                return '{param_name}不能等于{value_or_param_name}';
+                return '{param_name}不能等于{value_or_param_name}。';
             case '!==':
-                return '{param_name}不能等于{value_or_param_name}';
+                return '{param_name}不能等于{value_or_param_name}。';
             case '>':
-                return '{param_name}必须大于{value_or_param_name}';
+                return '{param_name}必须大于{value_or_param_name}。';
             case '>=':
-                return '{param_name}不能小于{value_or_param_name}';
+                return '{param_name}不能小于{value_or_param_name}。';
             case '<':
-                return '{param_name}必须小于{value_or_param_name}';
+                return '{param_name}必须小于{value_or_param_name}。';
             case '<=':
-                return '{param_name}不能大于{value_or_param_name}';
+                return '{param_name}不能大于{value_or_param_name}。';
             default:
                 return '';
         }
