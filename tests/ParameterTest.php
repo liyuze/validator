@@ -34,16 +34,16 @@ class ParameterTest extends TestCase
         ]);
 
         $p = $ps->getParam('param_1');
-        $this->assertEquals($p->getName(), 'param_1');
-        $this->assertEquals($p->getValue(), 1);
-        $this->assertEquals($p->getAliasOrName(), '参数1');
+        $this->assertEquals('param_1', $p->getName());
+        $this->assertEquals(1, $p->getValue());
+        $this->assertEquals('参数1', $p->getAliasOrName());
 
         $parameters = $this->getPrivateProperty($p, '_parameters');
         if ($parameters)
             $this->assertInstanceOf(Parameters::class, $parameters);
 
         $p2 = $ps->getParam('param_2');
-        $this->assertEquals($p2->getAliasOrName(), 'param_2');
+        $this->assertEquals('param_2', $p2->getAliasOrName());
 
         return $p;
     }
@@ -80,13 +80,13 @@ class ParameterTest extends TestCase
     {
         $p->validate();
         $hasError = $p->getParameters()->hasError($p->getName());
-        $this->assertEquals($hasError, true);
+        $this->assertTrue($hasError);
 
         $validators = $this->getPrivateProperty($p, '_validators');
         if ($validators) {
             $validateStatus = $this->getPrivateProperty($validators[0], '_validateStatus');
             if ($validateStatus)
-                $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_DONE);
+                $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
         }
 
         $p->setValue('string');
@@ -95,11 +95,11 @@ class ParameterTest extends TestCase
         if ($validators) {
             $validateStatus = $this->getPrivateProperty($validators[0], '_validateStatus');
             if ($validateStatus)
-                $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+                $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
         }
 
         $p->validate();
         $hasError = $p->getParameters()->hasError($p->getName());
-        $this->assertEquals($hasError, false);
+        $this->assertFalse($hasError);
     }
 }

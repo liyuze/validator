@@ -36,17 +36,17 @@ class StringValidatorTest extends TestCase
         $validator = new StringValidator([]);
         $error = '';
         $r = $validator->validate("1",$error);
-        $this->assertEquals($r, true);
+        $this->assertTrue($r);
         $r = $validator->validate(1,$error);
-        $this->assertEquals($r, false);
+        $this->assertFalse($r);
 
         $param_name = 'param_1';
         $parameters = $this->parameters;
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), false);
+        $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1);
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), true);
+        $this->assertTrue($parameters->hasError($param_name));
 
     }
 
@@ -59,17 +59,17 @@ class StringValidatorTest extends TestCase
         $validator = new StringValidator(['minLength' => 5]);
         $error = '';
         $r = $validator->validate("555555",$error);
-        $this->assertEquals($r, true);
+        $this->assertTrue($r);
         $r = $validator->validate("4444",$error);
-        $this->assertEquals($r, false);
+        $this->assertFalse($r);
 
         $param_name = 'param_2';
         $parameters = $this->parameters;
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), false);
+        $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, "4444");
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), true);
+        $this->assertTrue($parameters->hasError($param_name));
     }
 
     /**
@@ -81,17 +81,17 @@ class StringValidatorTest extends TestCase
         $validator = new StringValidator(['maxLength' => 4]);
         $error = '';
         $r = $validator->validate("4444",$error);
-        $this->assertEquals($r, true);
+        $this->assertTrue($r);
         $r = $validator->validate("555555",$error);
-        $this->assertEquals($r, false);
+        $this->assertFalse($r);
 
 
         $param_name = 'param_3';
         $parameters = $this->parameters;
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), false);
+        $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, "666666");
         $parameters->validate();
-        $this->assertEquals($parameters->hasError($param_name), true);
+        $this->assertTrue($parameters->hasError($param_name));
     }
 }

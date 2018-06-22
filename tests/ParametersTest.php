@@ -49,7 +49,7 @@ class ParametersTest extends TestCase
         $this->assertInstanceOf(Parameter::class, $p1);
 
         $p2 = $ps->getParam('param_2');
-        $this->assertEquals($p2, null);
+        $this->assertEquals(null, $p2);
     }
 
     /**
@@ -60,10 +60,10 @@ class ParametersTest extends TestCase
     public function testGetParamValue(Parameters $ps)
     {
         $value = $ps->getParamValue('param_1');
-        $this->assertEquals($value, 1);
+        $this->assertEquals(1, $value);
 
         $value = $ps->getParamValue('param_2');
-        $this->assertEquals($value, null);
+        $this->assertEquals(null, $value);
     }
 
     /**
@@ -80,7 +80,7 @@ class ParametersTest extends TestCase
 
         $validator = $this->getPrivateProperty($param_1, '_validators');
         $validateStatus = $this->getPrivateProperty($validator[0], '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_DONE);
+        $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
 
         $ps->setParamsValue('param_1', 11);
         $this->assertFalse($ps->hasError('param_1'), '清除验证错误消息');
@@ -88,7 +88,7 @@ class ParametersTest extends TestCase
         $param_1 = $ps->getParam('param_1');
         $validator = $this->getPrivateProperty($param_1, '_validators');
         $validateStatus = $this->getPrivateProperty($validator[0], '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
     }
 
     /**
@@ -101,7 +101,7 @@ class ParametersTest extends TestCase
     {
         $param_2 = 2;
         $ps->addParam('param_2', $param_2);
-        $this->assertEquals($ps->hasParam('param_2'), true);
+        $this->assertTrue($ps->hasParam('param_2'));
 
         return $ps;
     }
@@ -133,8 +133,8 @@ class ParametersTest extends TestCase
             'param_3' => $param_3,
             'param_4' => $param_4
         ]);
-        $this->assertEquals($ps->hasParam('param_3'), true);
-        $this->assertEquals($ps->hasParam('param_4'), true);
+        $this->assertTrue($ps->hasParam('param_3'));
+        $this->assertTrue($ps->hasParam('param_4'));
     }
 
     /**
@@ -145,7 +145,7 @@ class ParametersTest extends TestCase
     public function testClearParams(Parameters $ps)
     {
         $ps->clearParams();
-        $this->assertEquals($ps->hasParam('param_1'), false);
+        $this->assertFalse($ps->hasParam('param_1'));
     }
     //endregion
 
@@ -179,13 +179,13 @@ class ParametersTest extends TestCase
     public function testHasError(Parameters $ps)
     {
         $hasError = $ps->hasError();
-        $this->assertEquals($hasError, true);
+        $this->assertTrue($hasError);
 
         $hasError = $ps->hasError('param_1');
-        $this->assertEquals($hasError, true);
+        $this->assertTrue($hasError);
 
         $hasError = $ps->hasError('param_9');
-        $this->assertEquals($hasError, false);
+        $this->assertFalse($hasError);
     }
 
     /**
@@ -196,7 +196,7 @@ class ParametersTest extends TestCase
     public function testGetErrors(Parameters $ps)
     {
         $errors = $ps->getErrors();
-        $this->assertEquals($errors, [
+        $this->assertEquals([
             'param_1' => [
                 'string' => 'param_1 error message A and B',
                 'number' => 'param_1 error message',
@@ -204,12 +204,12 @@ class ParametersTest extends TestCase
             'param_2' => [
                 'number' => 'param_2 error message',
             ]
-        ]);
+        ], $errors);
 
         $errors = $ps->getErrors('param_2');
-        $this->assertEquals($errors, [
+        $this->assertEquals([
             'number' => 'param_2 error message',
-        ]);
+        ], $errors);
     }
 
     /**
@@ -226,7 +226,7 @@ class ParametersTest extends TestCase
         $this->assertContains($error, ['param_2 error message']);
 
         $error = $ps->getFirstErrorMessage('param_9');
-        $this->assertEquals($error, '');
+        $this->assertEquals('', $error);
     }
 
     /**
@@ -238,13 +238,13 @@ class ParametersTest extends TestCase
     {
         $ps->clearErrors('param_1');
         $hasErrors = $ps->hasError('param_1');
-        $this->assertEquals($hasErrors, false);
+        $this->assertFalse($hasErrors);
 
         $hasErrors = $ps->hasError();
-        $this->assertEquals($hasErrors, true);
+        $this->assertTrue($hasErrors);
         $ps->clearErrors();
         $hasErrors = $ps->hasError();
-        $this->assertEquals($hasErrors, false);
+        $this->assertFalse($hasErrors);
     }
 
     //endregion
@@ -266,10 +266,10 @@ class ParametersTest extends TestCase
         ], true);
 
         $hasParam = $ps->hasParam('param_3');
-        $this->assertEquals($hasParam, true);
+        $this->assertTrue($hasParam);
 
         $validateAllParams = $ps->validateAllParams;
-        $this->assertEquals($validateAllParams, true);
+        $this->assertTrue($validateAllParams);
     }
 
     /**
@@ -281,19 +281,19 @@ class ParametersTest extends TestCase
     {
         $config = 'string';
         $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame($parseConfig, [['string']]);
+        $this->assertSame([['string']], $parseConfig);
 
         $config = ['string'];
         $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame($parseConfig, [['string']]);
+        $this->assertSame([['string']], $parseConfig);
 
         $config = ['string', 'maxLength' => 150, 'number', 'mustInt' => true];
         $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame($parseConfig, [['string', 'maxLength' => 150], ['number', 'mustInt' => true]]);
+        $this->assertSame([['string', 'maxLength' => 150], ['number', 'mustInt' => true]], $parseConfig);
 
         $config = [['string', 'maxLength' => 150], ['number', 'mustInt' => true]];
         $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame($parseConfig, [['string', 'maxLength' => 150], ['number', 'mustInt' => true]]);
+        $this->assertSame([['string', 'maxLength' => 150], ['number', 'mustInt' => true]], $parseConfig);
     }
 
     /**
@@ -310,20 +310,20 @@ class ParametersTest extends TestCase
 
         $ps->addValidator('param_1', 'string');
         $ps->validate();
-        $this->assertEquals($ps->hasError('param_1'), true);
+        $this->assertTrue($ps->hasError('param_1'));
 
         $ps2->setValidatorConfig([
             'param_1' => 'string',
             'param_2' => ['number', 'min' => 5, 'skipHasError' => false],
         ]);
         $ps2->validate();
-        $this->assertEquals($ps2->hasError('param_1'), true);
-        $this->assertEquals($ps2->hasError('param_2'), false);
+        $this->assertTrue($ps2->hasError('param_1'));
+        $this->assertFalse($ps2->hasError('param_2'));
 
         $ps2->validateAllParams = true;
         $ps2->validate();
-        $this->assertEquals($ps2->hasError('param_1'), true);
-        $this->assertEquals($ps2->hasError('param_2'), true);
+        $this->assertTrue($ps2->hasError('param_1'));
+        $this->assertTrue($ps2->hasError('param_2'));
     }
 
     //endregion

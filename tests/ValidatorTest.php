@@ -41,10 +41,10 @@ class ValidatorTest extends TestCase
     public function testSet()
     {
         $this->validator->skipHasError = false;
-        $this->assertEquals($this->validator->skipHasError, false);
+        $this->assertFalse($this->validator->skipHasError);
 
         $this->validator->someString = false;
-        $this->assertEquals(property_exists($this->validator, 'someString'), false);
+        $this->assertFalse(property_exists($this->validator, 'someString'));
 
         $this->validator->_name = 'tset';
         $this->assertEquals($this->getPrivateProperty($this->validator, '_name'), '');
@@ -56,15 +56,15 @@ class ValidatorTest extends TestCase
     public function testUdateValidateStatus()
     {
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
 
         $this->callPrivateMethod($this->validator, 'updateValidateStatus', [Validator::VALIDATE_STATUS_DONE]);
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_DONE);
+        $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
 
         $this->callPrivateMethod($this->validator, 'updateValidateStatus', ['error value']);
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
     }
 
     /**
@@ -74,23 +74,23 @@ class ValidatorTest extends TestCase
     {
         //默认
         $isEmpty = $this->validator->isEmpty(null);
-        $this->assertEquals($isEmpty, true);
+        $this->assertTrue($isEmpty);
         $isEmpty = $this->validator->isEmpty('');
-        $this->assertEquals($isEmpty, true);
+        $this->assertTrue($isEmpty);
         $isEmpty = $this->validator->isEmpty([]);
-        $this->assertEquals($isEmpty, true);
+        $this->assertTrue($isEmpty);
 
         //array
         $this->validator->isEmpty = [null, ''];
         $isEmpty = $this->validator->isEmpty([]);
-        $this->assertEquals($isEmpty, false);
+        $this->assertFalse($isEmpty);
 
         //callable
         $this->validator->isEmpty = function ($value) {
             return $value > 3;
         };
         $isEmpty = $this->validator->isEmpty(4);
-        $this->assertEquals($isEmpty, true);
+        $this->assertTrue($isEmpty);
     }
 
     /**
@@ -110,10 +110,10 @@ class ValidatorTest extends TestCase
 
         //验证状态
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
         $this->validator->validateParam($parameter);
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_DONE);
+        $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
 
         //有其他错误时跳过验证
         $parameter->setValue(11);
@@ -121,7 +121,7 @@ class ValidatorTest extends TestCase
             '{param_name}的值不能大于{max}', ['max' => 5, 'param_name' => 'param_9']);
         $this->validator->validateParam($parameter);
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals($validateStatus, Validator::VALIDATE_STATUS_WAITING);
+        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
     }
 
     /**
@@ -137,8 +137,8 @@ class ValidatorTest extends TestCase
 
         $error = '';
         $r = $this->validator->validate(1, $error);
-        $this->assertEquals($r, true);
-        $this->assertEquals($error, '');
+        $this->assertTrue($r);
+        $this->assertEquals('', $error);
     }
 
     /**
@@ -154,8 +154,8 @@ class ValidatorTest extends TestCase
 
         $error = '';
         $r = $this->validator->validate(9, $error);
-        $this->assertEquals($r, false);
-        $this->assertEquals($error, '该输入的值不能大于5');
+        $this->assertFalse($r);
+        $this->assertEquals('该输入的值不能大于5', $error);
     }
 
     /**
@@ -166,7 +166,7 @@ class ValidatorTest extends TestCase
         $message_template = '{param_name}的值不能大于{max}';
         $param = ['max' => 5];
         $message = $this->callPrivateMethod($this->validator, 'formatMessage', [$message_template, $param]);
-        $this->assertEquals($message, '该输入的值不能大于5');
+        $this->assertEquals('该输入的值不能大于5', $message);
     }
 
     /**
@@ -184,7 +184,7 @@ class ValidatorTest extends TestCase
             'test']);
 
 
-        $this->assertEquals($parameters->hasError($param_name), true);
-        $this->assertEquals($parameters->getFirstErrorMessage($param_name), $param_name.'的值不能大于5');
+        $this->assertTrue($parameters->hasError($param_name));
+        $this->assertEquals($param_name.'的值不能大于5', $parameters->getFirstErrorMessage($param_name));
     }
 }
