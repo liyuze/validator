@@ -1,5 +1,9 @@
 language: php
 
+branches:
+  only:
+    - develop
+    
 install:
   - travis_retry composer install --no-interaction --prefer-dist --optimize-autoloader
   - travis_retry composer global require phpunit/phpunit ^5
