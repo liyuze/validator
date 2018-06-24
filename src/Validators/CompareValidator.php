@@ -2,7 +2,7 @@
 
 namespace liyuze\validator\Validators;
 
-use liyuze\validator\Exceptions\Exception;
+use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 
 class CompareValidator extends Validator
@@ -49,12 +49,17 @@ class CompareValidator extends Validator
      */
     public $message = '';
 
+    /**
+     * CompareValidator constructor.
+     * @param array $config
+     * @throws InvalidConfigException
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
 
         if (!in_array($this->operator, $this->_validOperator))
-            throw new Exception();//todo 无效的参数
+            throw new InvalidConfigException('Invalid operator value.');
 
         $this->message == '' && $this->message = $this->compareMessage($this->operator);
     }
@@ -76,12 +81,12 @@ class CompareValidator extends Validator
                 //todo 参数无效，没有该参数
             }
             if (!$this->compareValue($this->operator, $value, $otherParameter->getValue())) {
-                $this->addError($parameter, $this->message, ['value_or_param_name' => $otherParameter->getAlias()]);
+                $this->addError($parameter, $this->message, ['value_or_param_name' => $otherParameter->getAliasOrName()]);
             }
             //值对比
         } else {
             if (!$this->compareValue($this->operator, $value, $this->compareValue)) {
-                $this->addError($parameter, $this->message, ['value_or_param_name' => $this->compareParamName]);
+                $this->addError($parameter, $this->message, ['value_or_param_name' => $this->_formatData($this->compareValue)]);
             }
         }
 
@@ -96,7 +101,7 @@ class CompareValidator extends Validator
     protected function _validateValue($value)
     {
         if (!$this->compareValue($this->operator, $value, $this->compareValue)) {
-            return [$this->message, ['value_or_param_name' => $this->compareValue]];
+            return [$this->message, ['value_or_param_name' => $this->_formatData($this->compareValue)]];
         }
 
         return true;
@@ -146,23 +151,49 @@ class CompareValidator extends Validator
     {
         switch ($operator) {
             case '==':
-                return '{param_name}必须等于{value_or_param_name}。';
+                return '{param_name}的值必须等于{value_or_param_name}。';
             case '===':
-                return '{param_name}必须等于{value_or_param_name}。';
+                return '{param_name}的值必须等于{value_or_param_name}。';
             case '!=':
-                return '{param_name}不能等于{value_or_param_name}。';
+                return '{param_name}的值不能等于{value_or_param_name}。';
             case '!==':
-                return '{param_name}不能等于{value_or_param_name}。';
+                return '{param_name}的值不能等于{value_or_param_name}。';
             case '>':
-                return '{param_name}必须大于{value_or_param_name}。';
+                return '{param_name}的值必须大于{value_or_param_name}。';
             case '>=':
-                return '{param_name}不能小于{value_or_param_name}。';
+                return '{param_name}的值不能小于{value_or_param_name}。';
             case '<':
-                return '{param_name}必须小于{value_or_param_name}。';
+                return '{param_name}的值必须小于{value_or_param_name}。';
             case '<=':
-                return '{param_name}不能大于{value_or_param_name}。';
+                return '{param_name}的值不能大于{value_or_param_name}。';
             default:
                 return '';
+        }
+    }
+
+    private function _formatData($value)
+    {
+        if (is_string($value))
+            return '"'.$value.'"';
+        if (is_numeric($value))
+            return $value;
+        if ($value === null)
+            return 'null';
+        if ($value === true)
+            return 'true';
+        if ($value === false)
+            return 'false';
+        if (is_object($value)) {
+            return 'object';
+        }
+        if (is_array($value)) {
+            return 'array';
+        }
+        if (is_resource($value)) {
+            return 'resource';
+        }
+        if (is_callable($value)) {
+            return 'callable';
         }
     }
 }

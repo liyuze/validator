@@ -25,12 +25,12 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "liyuze\\validator\\tests\\": "tests"
+            "liyuze\\validator\\tests\\": "tests/"
         }
     },
     "autoload": {
         "psr-4": {
-            "liyuze\\validator\\": "src"
+            "liyuze\\validator\\": "src/"
         }
     },
     "repositories": {

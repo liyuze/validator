@@ -64,9 +64,9 @@ class Parameters
     public function config(array $config, $validateAllParams = null)
     {
         foreach ($config as $param_name => $v) {
-            list($param_value, $validate_rule) = array_pad((array)$v, 2, []);
-            $this->addParam($param_name, $param_value);
-            $this->addValidator($param_name, $validate_rule);
+            list($param_value, $validate_rule, $alias) = array_pad((array)$v, 3, null);
+            $this->addParam($param_name, $param_value, $alias);
+            $this->addValidator($param_name, (array)$validate_rule);
         }
 
         if (isset($validateAllParams))
@@ -190,6 +190,9 @@ class Parameters
         $this->addParam($param_name);
 
         $validator_config = $this->parseValidatorConfig($validator_config);
+
+        if(empty($validator_config))
+            return;
 
         $Parameter = $this->getParam($param_name);
         $Parameter->setValidatorConfig($validator_config);
