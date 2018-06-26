@@ -12,6 +12,11 @@ class StringValidator extends Validator
     protected $_name = 'string';
 
     /**
+     * @var bool true 进行数据类型对比，false 数字类型将通过验证并转为字符串类型
+     */
+    public $strict = false;
+
+    /**
      * @var int 长度最小值.
      */
     public $minLength;
@@ -37,7 +42,7 @@ class StringValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是一个字符串。';
+        $this->message == '' && $this->message = '{param_name}的值必须是字符串。';
         $this->messageMinLength == '' && $this->messageMinLength = '{param_name}的字符串长度不能小于{min}。';
         $this->messageMaxLength == '' && $this->messageMaxLength = '{param_name}的字符串长度不能大于{max}。';
     }
@@ -51,8 +56,15 @@ class StringValidator extends Validator
     {
         $value = $parameter->getValue();
 
-        if (!is_string($value))
-            $this->addError($parameter, $this->message);
+        if (!is_string($value)) {
+            if ($this->strict === true)
+                $this->addError($parameter, $this->message);
+            elseif (is_numeric($value)) {
+                $value = (string)$value;
+                $parameter->setValue($value, false);
+            } else
+                $this->addError($parameter, $this->message);
+        }
 
         $length = mb_strlen($value, $this->encoding);
 
@@ -77,8 +89,14 @@ class StringValidator extends Validator
     protected function _validateValue($value)
     {
         //验证
-        if (!is_string($value))
-            return $this->message;
+        if (!is_string($value)) {
+            if ($this->strict === true)
+                return $this->message;
+            elseif (is_numeric($value))
+                $value = (string)$value;
+            else
+                return $this->message;
+        }
 
         $length = mb_strlen($value, $this->encoding);
 

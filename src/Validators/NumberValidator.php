@@ -17,6 +17,11 @@ class NumberValidator extends Validator
     public $mustInt = false;
 
     /**
+     * @var bool true 进行数据类型对比，false 字符串的数据格式将通过验证并转为数字类型
+     */
+    public $strict = false;
+
+    /**
      * @var int|float 最小值.
      */
     public $min;
@@ -52,10 +57,10 @@ class NumberValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = $this->mustInt ? '{param_name}必须是整数。' : '{param_name}必须是数字。';
-        $this->messageMin == '' && $this->messageMin = '{param_name}不能小于{min}。';
-        $this->messageMax == '' && $this->messageMax = '{param_name}不能大于{max}。';
-        $this->messageEqual == '' && $this->messageEqual = '{param_name}必须等于{equal}。';
+        $this->message == '' && $this->message = $this->mustInt ? '{param_name}的值必须是整数。' : '{param_name}的值必须是数字。';
+        $this->messageMin == '' && $this->messageMin = '{param_name}的值不能小于{min}。';
+        $this->messageMax == '' && $this->messageMax = '{param_name}的值不能大于{max}。';
+        $this->messageEqual == '' && $this->messageEqual = '{param_name}的值必须等于{equal}。';
     }
 
     /**
@@ -69,19 +74,36 @@ class NumberValidator extends Validator
 
         //整数验证
         if ($this->mustInt) {
-            if (!is_int($value) || !preg_match($this->integerPattern, $value)) {
-                $this->addError($parameter, $this->message);
-                return false;
-            } else
-                $value = intval($value);
+            if ($this->strict === true) {
+                if (!is_int($value)) {
+                    $this->addError($parameter, $this->message);
+                    return false;
+                }
+            } else {
+                if (!preg_match($this->integerPattern, $value)) {
+                    $this->addError($parameter, $this->message);
+                    return false;
+                }
+                $value = (int)$value;
+                $parameter->setValue($value, false);
+            }
 
         //浮点数验证
         } else {
-            if (!is_numeric($value)) {
-                $this->addError($parameter, $this->message);
-                return false;
-            } else
-                $value = floatval($value);
+            if ($this->strict === true) {
+                if (!is_float($value)) {
+                    $this->addError($parameter, $this->message);
+                    return false;
+                }
+            } else {
+//                if (!is_numeric($value)) {
+                if (!preg_match($this->numberPattern, $value)) {
+                    $this->addError($parameter, $this->message);
+                    return false;
+                }
+                $value = (float)$value;
+                $parameter->setValue($value, false);
+            }
         }
 
         //相等值验证
@@ -89,9 +111,9 @@ class NumberValidator extends Validator
             $this->addError($parameter, $this->messageEqual, ['equal' => $this->equal]);
             return false;
         }
-
         //最大值验证
         if ($this->max !== null && $value > $this->max) {
+
             $this->addError($parameter, $this->messageMax, ['max' => $this->max], 'max');
         }
 
@@ -112,17 +134,30 @@ class NumberValidator extends Validator
     {
         //整数验证
         if ($this->mustInt) {
-            if (!is_int($value) || !preg_match($this->integerPattern, $value))
-                return $this->message;
-            else
-                $value = intval($value);
+            if ($this->strict === true) {
+                if (!is_int($value)) {
+                    return $this->message;
+                }
+            } else {
+                if (!preg_match($this->integerPattern, $value)) {
+                    return $this->message;
+                }
+                $value = (int)$value;
+            }
 
             //浮点数验证
         } else {
-            if (!is_numeric($value))
-                return $this->message;
-            else
-                $value = floatval($value);
+            if ($this->strict === true) {
+                if (!is_float($value)) {
+                    return $this->message;
+                }
+            } else {
+//                if (!is_numeric($value)) {
+                if (!preg_match($this->numberPattern, $value)) {
+                    return $this->message;
+                }
+                $value = (float)$value;
+            }
         }
 
         //相等值验证
@@ -137,7 +172,7 @@ class NumberValidator extends Validator
 
         //最小值验证
         if ($this->min !== null && $value < $this->min) {
-            return [$this->messageMax, ['min' => $this->min]];
+            return [$this->messageMin, ['min' => $this->min]];
         }
 
         return true;
