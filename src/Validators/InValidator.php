@@ -97,7 +97,7 @@ class InValidator extends Validator
      * @param array $value
      * @throws InvalidConfigException
      */
-    private function setRange($value)
+    public function setRange($value)
     {
         if (!is_array($value) || empty($value))
             throw new InvalidConfigException('Invalid range value.');

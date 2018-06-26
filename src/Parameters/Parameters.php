@@ -335,7 +335,7 @@ class Parameters
     }
 
 //    /**
-//     * 获取第一个错误
+//     * hasError
 //     * @param null|string $param_name 参数名
 //     * @return array|mixed
 //     */

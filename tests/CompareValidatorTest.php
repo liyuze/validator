@@ -3,9 +3,7 @@ namespace liyuze\validator\tests;
 
 use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameters;
-use liyuze\validator\Validators\ArrayValidator;
 use liyuze\validator\Validators\CompareValidator;
-use liyuze\validator\Validators\StringValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,6 +29,10 @@ class CompareValidatorTest extends TestCase
         ], true);
     }
 
+    /**
+     * @covers ::validateParam()
+     * @covers ::validate()
+     */
     public function testDefault()
     {
         $validator = new CompareValidator();
@@ -49,6 +51,10 @@ class CompareValidatorTest extends TestCase
         $this->assertEquals('param_1的值必须等于null。', $parameters->getFirstErrorMessage($param_name));
     }
 
+    /**
+     * @covers ::validateParam()
+     * @covers ::validate()
+     */
     public function testCompareParam()
     {
         $param_name = 'param_2';
@@ -61,6 +67,10 @@ class CompareValidatorTest extends TestCase
         $this->assertEquals('param_2的值必须等于param_3。', $parameters->getFirstErrorMessage($param_name));
     }
 
+    /**
+     * @covers ::validateParam()
+     * @covers ::validate()
+     */
     public function testCompareValue()
     {
         $validator = new CompareValidator(['compareValue' => 'string']);
@@ -79,6 +89,10 @@ class CompareValidatorTest extends TestCase
         $this->assertEquals('param_3的值必须等于"test value"。', $parameters->getFirstErrorMessage($param_name));
     }
 
+    /**
+     * @covers ::validateParam()
+     * @covers ::validate()
+     */
     public function testOperator()
     {
         $validator = new CompareValidator(['compareValue' => 3, 'operator' => '>']);
@@ -97,10 +111,9 @@ class CompareValidatorTest extends TestCase
         $this->assertEquals('param_4的值必须大于3。', $parameters->getFirstErrorMessage($param_name));
     }
 
-
     /**
-     * @throws InvalidConfigException
-     * @expectedException liyuze\validator\Exceptions\InvalidConfigException
+     * @throws \liyuze\validator\Exceptions\InvalidConfigException
+     * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */
     public function testInvalidConfigException()
     {

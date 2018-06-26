@@ -28,7 +28,8 @@ class ArrayValidatorTest extends TestCase
     }
 
     /**
-     * @covers ::va
+     * @covers ::validate()
+     * @covers ::validateParam()
      */
     public function testType()
     {
@@ -48,6 +49,10 @@ class ArrayValidatorTest extends TestCase
         $this->assertEquals('param_1必须是数组类型。', $parameters->getFirstErrorMessage($param_name));
     }
 
+    /**
+     * @covers ::validate()
+     * @covers ::validateParam()
+     */
     public function testKeyValidate()
     {
         $validator = new ArrayValidator(['keyValidateConfig' => 'integer']);
@@ -63,24 +68,28 @@ class ArrayValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, ['a' => 1, 'b' => 2]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals('param_2的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 
+    /**
+     * @covers ::validate()
+     * @covers ::validateParam()
+     */
     public function testValueValidate()
     {
         $validator = new ArrayValidator(['valueValidateConfig' => 'string']);
         $error = '';
         $this->assertTrue($validator->validate(['a','b'], $error));
-        $this->assertFalse($validator->validate(['a' => 1, 'b' => 2], $error));
+        $this->assertFalse($validator->validate(['a' => false, 'b' => false], $error));
         $this->assertEquals('该输入的value值的格式不正确。', $error);
 
         $param_name = 'param_3';
         $parameters = $this->_parameters;
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
-        $parameters->setParamsValue($param_name, ['a' => 1, 'b' => 2]);
+        $parameters->setParamsValue($param_name, ['a' => false, 'b' => false]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals('param_3的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 }

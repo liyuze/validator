@@ -2,7 +2,6 @@
 namespace liyuze\validator\tests;
 
 use liyuze\validator\Parameters\Parameters;
-use liyuze\validator\Validators\StringValidator;
 use liyuze\validator\Validators\Validator;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use PHPUnit\Framework\MockObject\MockObject;

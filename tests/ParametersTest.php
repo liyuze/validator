@@ -75,7 +75,7 @@ class ParametersTest extends TestCase
     {
         $ps->addValidator('param_1', 'string');
         $ps->validate();
-        $this->assertTrue($ps->hasError('param_1'));
+        $this->assertFalse($ps->hasError('param_1'));
         $param_1 = $ps->getParam('param_1');
 
         $validator = $this->getPrivateProperty($param_1, '_validators');
@@ -308,12 +308,12 @@ class ParametersTest extends TestCase
     public function testValidate(Parameters $ps, Parameters $ps2)
     {
 
-        $ps->addValidator('param_1', 'string');
+        $ps->addValidator('param_1', 'boolean');
         $ps->validate();
         $this->assertTrue($ps->hasError('param_1'));
 
         $ps2->setValidatorConfig([
-            'param_1' => 'string',
+            'param_1' => 'boolean',
             'param_2' => ['number', 'min' => 5, 'skipHasError' => false],
         ]);
         $ps2->validate();

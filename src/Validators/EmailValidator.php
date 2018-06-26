@@ -39,7 +39,7 @@ class EmailValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是有效的Email。';
+        $this->message == '' && $this->message = '{param_name}的值不是有效的Email。';
     }
 
     /**

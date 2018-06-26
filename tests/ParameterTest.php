@@ -57,10 +57,10 @@ class ParameterTest extends TestCase
      */
     public function testSetValidatorConfig(Parameter $p)
     {
-        $p->setValidatorConfig([['required'],['string']]);
+        $p->setValidatorConfig([['required'],['boolean']]);
 
         $config = $p->getValidatorConfig();
-        $this->assertSame($config, [['required'],['string']]);
+        $this->assertSame($config, [['required'],['boolean']]);
 
         $validators = $this->getPrivateProperty($p, '_validators');
         if ($validators)
@@ -89,7 +89,7 @@ class ParameterTest extends TestCase
                 $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
         }
 
-        $p->setValue('string');
+        $p->setValue(true);
         $hasError = $p->getParameters()->hasError($p->getName());
         $this->assertEquals($hasError, false);
         if ($validators) {
