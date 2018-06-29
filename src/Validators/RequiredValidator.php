@@ -16,6 +16,11 @@ class RequiredValidator extends Validator
      */
     public $skipIsEmpty = false;
 
+    /*
+     * 设置值判断null
+     */
+    public $isEmpty = [null];
+
     /**
      * @var string 错误消息
      */
@@ -25,7 +30,7 @@ class RequiredValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不能为空。';
+        $this->message == '' && $this->message = '{param_name}的值不能为空。';
     }
 
     /**
@@ -36,7 +41,7 @@ class RequiredValidator extends Validator
     protected function _validateParam(Parameter $parameter)
     {
         $value = $parameter->getValue();
-        $value = is_string($value) ? trim($value) : $value;
+
         if ($this->isEmpty($value)) {
             $this->addError($parameter, $this->message);
         }
@@ -51,7 +56,6 @@ class RequiredValidator extends Validator
      */
     protected function _validateValue($value)
     {
-        $value = is_string($value) ? trim($value) : $value;
         if ($this->isEmpty($value)) {
             return $this->message;
         }
