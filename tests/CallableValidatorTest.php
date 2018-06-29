@@ -38,14 +38,6 @@ class CallableValidatorTest extends TestCase
      */
     public function testFunction()
     {
-
-        function isString($value, $parameter, $methodValidator)
-        {
-            if (!is_string($value)) {
-                $methodValidator->addError($parameter, '输入的值不是一个字符串');
-            }
-        }
-
         $param_name = 'param_1';
         $parameters = $this->_parameters;
         $parameters->validate();
@@ -129,4 +121,11 @@ class CallableValidatorTest extends TestCase
         }
     }
 
+}
+
+function isString($value, $parameter, $methodValidator)
+{
+    if (!is_string($value)) {
+        $methodValidator->addError($parameter, '输入的值不是一个字符串');
+    }
 }

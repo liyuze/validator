@@ -41,14 +41,18 @@ class CallableValidator extends Validator
     {
         parent::__construct($config);
 
-        if ($this->method === null) {
-            throw new InvalidConfigException('The "method" property must be set.');
-        } elseif (!is_string($this->method) && !($this->method instanceof \Closure)) {
-            throw new InvalidConfigException('Invalid method value.');
-        }
-
-        if ($this->target !== null && !is_object($this->target) && !class_exists($this->target)) {
-            throw new InvalidConfigException('Invalid target value.');
+        if ($this->target !== null) {
+            if (!is_object($this->target) && !class_exists($this->target))
+                throw new InvalidConfigException('Invalid target value.');
+            elseif (!method_exists($this->target, $this->method))
+                throw new InvalidConfigException('Invalid method value.');
+        } else {
+            if ($this->method === null) {
+                throw new InvalidConfigException('The "method" property must be set.');
+            } elseif (!$this->method instanceof \Closure &&
+                !(is_string($this->method) && function_exists($this->method))) {
+                throw new InvalidConfigException('Invalid method value.');
+            }
         }
     }
 
