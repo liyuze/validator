@@ -5,11 +5,11 @@ namespace liyuze\validator\Validators;
 use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 
-class TemFileValidator extends Validator
+class UploadFileValidator extends Validator
 {
     use FileTrait;
 
-    protected $_name = 'tem_file';
+    protected $_name = 'upload_file';
 
     /**
      * @var integer 最大上传数量，0代表不限制

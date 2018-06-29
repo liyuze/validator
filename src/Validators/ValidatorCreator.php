@@ -23,13 +23,11 @@ class ValidatorCreator
         'date'      => '\liyuze\validator\Validators\DatetimeValidator',
         'time'      => '\liyuze\validator\Validators\DatetimeValidator',
 
-
         'email'     => '\liyuze\validator\Validators\EmailValidator',
         'url'       => '\liyuze\validator\Validators\UrlValidator',
         'file'      => '\liyuze\validator\Validators\FileValidator',
         'image'     => '\liyuze\validator\Validators\ImageValidator',
-        'tmp_file'  => '\liyuze\validator\Validators\TmpFileValidator',
-
+        'upload_file'  => '\liyuze\validator\Validators\UploadFileValidator',
 
         'compare'   => '\liyuze\validator\Validators\CompareValidator',
         'in'        => '\liyuze\validator\Validators\InValidator',
