@@ -1,6 +1,8 @@
 <?php
 
 namespace liyuze\validator\Validators;
+use liyuze\validator\Exceptions\InvalidArgumentException;
+use liyuze\validator\Exceptions\InvalidConfigException;
 
 /**
  * 验证器创建者
@@ -33,6 +35,7 @@ class ValidatorCreator
         'in'        => '\liyuze\validator\Validators\InValidator',
         'match'     => '\liyuze\validator\Validators\MatchValidator',
         'required'  => '\liyuze\validator\Validators\RequiredValidator',
+        'callable'  => '\liyuze\validator\Validators\CallableValidator',
     ];
 
 
@@ -41,24 +44,27 @@ class ValidatorCreator
      * @param string|callable $validator
      * @param array $params
      * @return mixed
+     * @throws InvalidArgumentException
+     * @throws InvalidConfigException
      */
     public static function create($validator, $params = [])
     {
-        //内建验证器
-        if (!is_string($validator)) {
-            var_dump($validator);die;
-        }
-
         if (key_exists($validator, self::$built_in_validators)) {
             $config = (array)self::$built_in_validators[$validator];
             $params = array_merge($params, array_slice($config, 1));
             return new $config[0]($params);
 
         //自定义验证器
-        } elseif (class_exists($validator) && $validator instanceof Validator) {
+        } elseif (class_exists($validator)) {
+            $object = new $validator($params);
+            if (!($object instanceof Validator)) {
+                throw new InvalidArgumentException('');
+            }
+            return $object;
 
         //可调用函数
-        } elseif ($validator instanceof \Closure) {
+        } elseif ($validator instanceof \Closure || (is_string($validator) && function_exists($validator))) {
+            return new CallableValidator(['method' => $validator]);
 
         //错误
         } else {
