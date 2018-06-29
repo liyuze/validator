@@ -203,7 +203,7 @@ abstract class Validator
      * @param array $params 验证消息参数
      * @param null|string $validate_name 验证名称
      */
-    protected function addError(Parameter $parameter, $error_template, $params = [], $validate_name = null )
+    public function addError(Parameter $parameter, $error_template, $params = [], $validate_name = null )
     {
         $validate_name = $validate_name === null ? $this->_name : $this->_name.'-'.$validate_name;
         $parameter->getParameters()->addError($parameter->getName(), $validate_name, $error_template, $params);

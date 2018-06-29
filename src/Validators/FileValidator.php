@@ -10,7 +10,7 @@ class FileValidator extends Validator
 {
     use FileTrait;
 
-    private $_name = 'file';
+    protected $_name = 'file';
 
     public function __construct($config = [])
     {
