@@ -22,8 +22,8 @@ class ValidatorCreator
         'array'     => '\liyuze\validator\Validators\ArrayValidator',
 
         'datetime'  => '\liyuze\validator\Validators\DatetimeValidator',
-        'date'      => '\liyuze\validator\Validators\DatetimeValidator',
-        'time'      => '\liyuze\validator\Validators\DatetimeValidator',
+        'date'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => 'date'],
+        'time'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => 'time'],
 
         'email'     => '\liyuze\validator\Validators\EmailValidator',
         'url'       => '\liyuze\validator\Validators\UrlValidator',

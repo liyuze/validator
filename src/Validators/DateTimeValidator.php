@@ -3,48 +3,107 @@
 namespace liyuze\validator\Validators;
 
 use liyuze\validator\Exceptions\Exception;
+use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 
 class DateTimeValidator extends Validator
 {
+    const TYPE_DATETIME = 'datetime';
+    const TYPE_DATE     = 'date';
+    const TYPE_TIME     = 'time';
+
     /**
      * @var string 验证器名称
      */
     protected $_name = 'datetime';
+
     /**
-     * 日期
-     * 时间
-     * 格式
+     * @var string 验证类型
+     */
+    public $type = self::TYPE_DATETIME;
+
+    /**
+     * @var string 指定验证的值的日期时间模式。
+     * 应该遵循以下两种日期格式：
+     * 第一种是 [ICU manual](http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax) 中的日期时间模式。
+     * 第二种是前缀为 `php:` 的字符串，表示为被 PHP Datetime class 解析的格式。
      *
+     * 例如:
+     *
+     * ```php
+     * 'MM/dd/yyyy' // ICU 表示格式
+     * 'php:m/d/Y' // PHP 表示格式
+     * 'MM/dd/yyyy HH:mm' // 包含时间部分的表示格式
+     * ```
      */
+    public $format;
 
+    /**
+     * @var string|int 时间范围最小值，可以是时间戳或与format对应的日期时间字符串
+     */
+    public $min;
+
+    /**
+     * @var string|int 时间范围最大值，可以是时间戳或与format对应的日期时间字符串
+     */
+    public $max;
 
 
     /**
-     * @var string 需要对比的参数的name值
+     * @var string|int min 原始值
      */
-    public $compareParamName;
+    private $_minString;
 
     /**
-     * @var mixed 需要对比的值
+     * @var string|int max 原始值
      */
-    public $compareValue;
+    private $_maxString;
 
     /**
-     * @var string 对比操作符
-     * ==：检查两值是否相等。比对为非严格模式。
-     * ===：检查两值是否全等。比对为严格模式。
-     * !=：检查两值是否不等。比对为非严格模式。
-     * !==：检查两值是否不全等。比对为严格模式。
-     * >：检查待测目标值是否大于给定被测值。
-     * >=：检查待测目标值是否大于等于给定被测值。
-     * <：检查待测目标值是否小于给定被测值。
-     * <=：检查待测目标值是否小于等于给定被测值。
+     * @var string 时区
      */
-    public $operator = '==';
+    public $timeZone = 'Asia/Shanghai';
 
-    private $_validOperator = [
-        '==', '===', '!=', '!==', '>', '>=', '<', '<='
+    /**
+     * @var string 本地化
+     */
+    public $locale = 'zh_CN';
+
+    /**
+     * @var array 对 IntlDateFormatter 常量值的数组映射的短格式名称
+     */
+    private static $_dateFormats = [
+        'short' => 3, // IntlDateFormatter::SHORT,
+        'medium' => 2, // IntlDateFormatter::MEDIUM,
+        'long' => 1, // IntlDateFormatter::LONG,
+        'full' => 0, // IntlDateFormatter::FULL,
+    ];
+
+    /**
+     * @var array the php fallback definition to use for the ICU short patterns `short`, `medium`, `long` and `full`.
+     * This is used as fallback when the intl extension is not installed.
+     */
+    public static $phpFallbackDatePatterns = [
+        'short' => [
+            'date' => 'n/j/y',
+            'time' => 'H:i',
+            'datetime' => 'n/j/y H:i',
+        ],
+        'medium' => [
+            'date' => 'M j, Y',
+            'time' => 'g:i:s A',
+            'datetime' => 'M j, Y g:i:s A',
+        ],
+        'long' => [
+            'date' => 'F j, Y',
+            'time' => 'g:i:sA',
+            'datetime' => 'F j, Y g:i:sA',
+        ],
+        'full' => [
+            'date' => 'l, F j, Y',
+            'time' => 'g:i:sA T',
+            'datetime' => 'l, F j, Y g:i:sA T',
+        ],
     ];
 
     /**
@@ -56,15 +115,46 @@ class DateTimeValidator extends Validator
      * @var string 错误消息
      */
     public $message = '';
+    public $messageMin = '';
+    public $messageMax = '';
 
+    /**
+     * DateTimeValidator constructor.
+     * @param array $config
+     * @throws InvalidConfigException
+     */
     public function __construct($config = [])
     {
         parent::__construct($config);
 
-        if (!in_array($this->operator, $this->_validOperator))
-            throw new Exception();//todo 无效的参数
+        if (!in_array($this->type, [self::TYPE_DATETIME, self::TYPE_DATE, self::TYPE_TIME]))
+            throw new InvalidConfigException('Invalid type value.');
 
-        $this->message == '' && $this->message = $this->compareMessage($this->operator);
+        if (empty($this->format))
+        throw new InvalidConfigException('The "format" property must be set.');
+
+        $this->_minString = (string)$this->min;
+        $this->_maxString = (string)$this->max;
+
+        if ($this->min !== null && is_string($this->min)) {
+            $timestamp = $this->parseStrToTimestamp($this->min);
+            if ($timestamp === false) {
+                throw new InvalidConfigException("Invalid min date value: {$this->min}");
+            }
+            $this->min = $timestamp;
+        }
+
+        if ($this->max !== null && is_string($this->max)) {
+            $timestamp = $this->parseStrToTimestamp($this->max);
+            if ($timestamp === false) {
+                throw new InvalidConfigException("Invalid max date value: {$this->max}");
+            }
+            $this->max = $timestamp;
+        }
+
+        $this->message == '' && $this->message = '{param_name}的值不是有效的时间值。';
+        $this->messageMin == '' && $this->messageMin = '{param_name}的值不能早于{min}。';
+        $this->messageMax == '' && $this->messageMax = '{param_name}的值不能晚于{max}。';
     }
 
     /**
@@ -76,23 +166,13 @@ class DateTimeValidator extends Validator
     {
         $value = $parameter->getValue();
 
-        //参数对比
-        if ($this->compareParamName !== null) {
-
-            $otherParameter = $parameter->getParameters()->getParam($this->compareParamName);
-            if ($otherParameter === null) {
-                //todo 参数无效，没有该参数
-            }
-            if (!$this->compareValue($this->operator, $value, $otherParameter->getValue())) {
-                $this->addError($parameter, 'compare', $this->message,
-                    ['value_or_param_name' => $otherParameter->getAlias()]);
-            }
-        //值对比
-        } else {
-            if (!$this->compareValue($this->operator, $value, $this->compareValue)) {
-                $parameter->parameters->addError($parameter->getName(), 'compare', $this->message,
-                    ['value_or_param_name' => $this->compareParamName]);
-            }
+        $timestamp = $this->parseStrToTimestamp($value);
+        if ($timestamp === false) {
+            $this->addError($parameter, $this->message);
+        } elseif ($this->max !== null && $timestamp > $this->max) {
+            $this->addError($parameter, $this->messageMax, ['max' => $this->_maxString]);
+        } elseif ($this->min !== null && $timestamp < $this->min) {
+            $this->addError($parameter, $this->messageMin, ['min' => $this->_minString]);
         }
 
         return true;
@@ -105,74 +185,243 @@ class DateTimeValidator extends Validator
      */
     protected function _validateValue($value)
     {
-        if (!$this->compareValue($this->operator, $value, $this->compareValue)) {
-            return [$this->message, ['value_or_param_name' => $this->compareValue]];
+        $timestamp = $this->parseStrToTimestamp($value);
+        if ($timestamp === false) {
+            return $this->message;
+        } elseif ($this->max !== null && $timestamp > $this->max) {
+            return [$this->messageMax, ['max' => $this->_maxString]];
+        } elseif ($this->min !== null && $timestamp < $this->min) {
+            return [$this->messageMin, ['min' => $this->_minString]];
         }
 
         return true;
     }
 
     /**
-     * 对比值
-     * @param string $operator 对比符
-     * @param mixed $value1
-     * @param mixed $value2
-     * @return bool
+     * 时间字符串转时间戳
+     * @param string $value 时间字符串
+     * @return false|int
      */
-    private function compareValue($operator, $value1, $value2)
+    private function parseStrToTimestamp($value)
     {
-        //去除字符串两边空格
-        is_string($value1) && $this->trimString && $value1 = trim($value1);
-        is_string($value2) && $this->trimString && $value2 = trim($value2);
+        if (strncmp($this->format, 'php:', 4) === 0)
+            $format = substr($this->format, 4);
+        else {
+            if (extension_loaded('intl')) {
+                return $this->parseStrToTimestampIntl($value, $this->format);
+            }
 
-        switch ($operator) {
-            case '==':
-                return $value1 == $value2;
-            case '===':
-                return $value1 === $value2;
-            case '!=':
-                return $value1 != $value2;
-            case '!==':
-                return $value1 !== $value2;
-            case '>':
-                return $value1 > $value2;
-            case '>=':
-                return $value1 >= $value2;
-            case '<':
-                return $value1 < $value2;
-            case '<=':
-                return $value1 <= $value2;
-            default:
-                return false;
+            $format = self::convertDateIcuToPhp($this->format, $this->type, $this->locale);
         }
+
+        return $this->parseStrToTimestampPHP($value, $format);
     }
 
     /**
-     * 对比错误消息
-     * @param string $operator 对比符
-     * @return bool
+     * 使用 IntlDateFormatter::parse() 解析时间字符串。
+     * @param string $value 需要转换的字符串
+     * @param string $format 指定字符串的时间格式
+     * @return integer|false 时间戳的值或失败
      */
-    private function compareMessage($operator)
+    private function parseStrToTimestampIntl($value, $format)
     {
-        switch ($operator) {
-            case '==':
-                return '{param_name}必须等于{value_or_param_name}';
-            case '===':
-                return '{param_name}必须等于{value_or_param_name}';
-            case '!=':
-                return '{param_name}不能等于{value_or_param_name}';
-            case '!==':
-                return '{param_name}不能等于{value_or_param_name}';
-            case '>':
-                return '{param_name}必须大于{value_or_param_name}';
-            case '>=':
-                return '{param_name}不能小于{value_or_param_name}';
-            case '<':
-                return '{param_name}必须小于{value_or_param_name}';
-            case '<=':
-                return '{param_name}不能大于{value_or_param_name}';
-            default:
-                return '';
+        if (isset(self::$_dateFormats[$format])) {
+            if ($this->type === self::TYPE_DATE) {
+                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], \IntlDateFormatter::NONE, $this->timeZone);
+            } elseif ($this->type === self::TYPE_DATETIME) {
+                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], self::$_dateFormats[$format], $this->timeZone);
+            } else {   //self::TYPE_TIME
+                $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, self::$_dateFormats[$format], $this->timeZone);
+            }
+        } else {
+            $hasTimeInfo = (strpbrk($format, 'ahHkKmsSA') !== false);
+            $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, $hasTimeInfo ? $this->timeZone : 'UTC', null, $format);
         }
+        // 开启严格验证模式
+        $formatter->setLenient(false);
+
+        // There should not be a warning thrown by parse() but this seems to be the case on windows so we suppress it here
+        // See https://github.com/yiisoft/yii2/issues/5962 and https://bugs.php.net/bug.php?id=68528
+        $parsePos = 0;
+        $parsedDate = @$formatter->parse($value, $parsePos);
+        if ($parsedDate === false || $parsePos !== mb_strlen($value, 'UTF-8')) {
+            return false;
+        }
+
+        return $parsedDate;
     }
+
+    /**
+     * 使用 the DateTime::createFromFormat() 解析时间字符串。
+     * @param string $value 需要转换的字符串
+     * @param string $format 指定字符串的时间格式
+     * @return integer|false 时间戳的值或失败
+     */
+    private function parseStrToTimestampPHP($value, $format)
+    {
+        $hasTimePart = (strpbrk($format, 'HhGgisU') !== false);
+
+        $timezone = $this->timeZone !== null ? new \DateTimeZone($this->timeZone): null;
+        $datetime = \DateTime::createFromFormat($format, $value, $timezone);
+        $errors = \DateTime::getLastErrors();
+        if ($datetime === false || $errors['error_count'])
+            return false;
+
+        if (!$hasTimePart)
+            $datetime->setTime(0,0,0);
+
+        return $datetime->getTimestamp();
+    }
+
+    /**
+     * Converts a date format pattern from [ICU format][] to [php date() function format][].
+     *
+     * The conversion is limited to date patterns that do not use escaped characters.
+     * Patterns like `d 'of' MMMM yyyy` which will result in a date like `1 of December 2014` may not be converted correctly
+     * because of the use of escaped characters.
+     *
+     * Pattern constructs that are not supported by the PHP format will be removed.
+     *
+     * [php date() function format]: http://php.net/manual/en/function.date.php
+     * [ICU format]: http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
+     *
+     * @param string $pattern date format pattern in ICU format.
+     * @param string $type 'date', 'time', or 'datetime'.
+     * @param string $locale the locale to use for converting ICU short patterns `short`, `medium`, `long` and `full`.
+     * If not given, `Yii::$app->language` will be used.
+     * @return string The converted date format pattern.
+     */
+    public static function convertDateIcuToPhp($pattern, $type = 'date', $locale = null)
+    {
+        if (isset(self::$_dateFormats[$pattern])) {
+            if (extension_loaded('intl')) {
+                if ($locale === null) {
+                    $locale = Yii::$app->language;
+                }
+                if ($type === 'date') {
+                    $formatter = new \IntlDateFormatter($locale, self::$_dateFormats[$pattern], \IntlDateFormatter::NONE);
+                } elseif ($type === 'time') {
+                    $formatter = new \IntlDateFormatter($locale, \IntlDateFormatter::NONE, self::$_dateFormats[$pattern]);
+                } else {
+                    $formatter = new \IntlDateFormatter($locale, self::$_dateFormats[$pattern], self::$_dateFormats[$pattern]);
+                }
+                $pattern = $formatter->getPattern();
+            } else {
+                return static::$phpFallbackDatePatterns[$pattern][$type];
+            }
+        }
+        // http://userguide.icu-project.org/formatparse/datetime#TOC-Date-Time-Format-Syntax
+        // escaped text
+        $escaped = [];
+        if (preg_match_all('/(?<!\')\'(.*?[^\'])\'(?!\')/', $pattern, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $match[1] = str_replace('\'\'', '\'', $match[1]);
+                $escaped[$match[0]] = '\\' . implode('\\', preg_split('//u', $match[1], -1, PREG_SPLIT_NO_EMPTY));
+            }
+        }
+
+        return strtr($pattern, array_merge($escaped, [
+            "''" => "\\'",  // two single quotes produce one
+            'G' => '',      // era designator like (Anno Domini)
+            'Y' => 'o',     // 4digit year of "Week of Year"
+            'y' => 'Y',     // 4digit year e.g. 2014
+            'yyyy' => 'Y',  // 4digit year e.g. 2014
+            'yy' => 'y',    // 2digit year number eg. 14
+            'u' => '',      // extended year e.g. 4601
+            'U' => '',      // cyclic year name, as in Chinese lunar calendar
+            'r' => '',      // related Gregorian year e.g. 1996
+            'Q' => '',      // number of quarter
+            'QQ' => '',     // number of quarter '02'
+            'QQQ' => '',    // quarter 'Q2'
+            'QQQQ' => '',   // quarter '2nd quarter'
+            'QQQQQ' => '',  // number of quarter '2'
+            'q' => '',      // number of Stand Alone quarter
+            'qq' => '',     // number of Stand Alone quarter '02'
+            'qqq' => '',    // Stand Alone quarter 'Q2'
+            'qqqq' => '',   // Stand Alone quarter '2nd quarter'
+            'qqqqq' => '',  // number of Stand Alone quarter '2'
+            'M' => 'n',     // Numeric representation of a month, without leading zeros
+            'MM' => 'm',    // Numeric representation of a month, with leading zeros
+            'MMM' => 'M',   // A short textual representation of a month, three letters
+            'MMMM' => 'F',  // A full textual representation of a month, such as January or March
+            'MMMMM' => '',
+            'L' => 'n',     // Stand alone month in year
+            'LL' => 'm',    // Stand alone month in year
+            'LLL' => 'M',   // Stand alone month in year
+            'LLLL' => 'F',  // Stand alone month in year
+            'LLLLL' => '',  // Stand alone month in year
+            'w' => 'W',     // ISO-8601 week number of year
+            'ww' => 'W',    // ISO-8601 week number of year
+            'W' => '',      // week of the current month
+            'd' => 'j',     // day without leading zeros
+            'dd' => 'd',    // day with leading zeros
+            'D' => 'z',     // day of the year 0 to 365
+            'F' => '',      // Day of Week in Month. eg. 2nd Wednesday in July
+            'g' => '',      // Modified Julian day. This is different from the conventional Julian day number in two regards.
+            'E' => 'D',     // day of week written in short form eg. Sun
+            'EE' => 'D',
+            'EEE' => 'D',
+            'EEEE' => 'l',  // day of week fully written eg. Sunday
+            'EEEEE' => '',
+            'EEEEEE' => '',
+            'e' => 'N',     // ISO-8601 numeric representation of the day of the week 1=Mon to 7=Sun
+            'ee' => 'N',    // php 'w' 0=Sun to 6=Sat isn't supported by ICU -> 'w' means week number of year
+            'eee' => 'D',
+            'eeee' => 'l',
+            'eeeee' => '',
+            'eeeeee' => '',
+            'c' => 'N',     // ISO-8601 numeric representation of the day of the week 1=Mon to 7=Sun
+            'cc' => 'N',    // php 'w' 0=Sun to 6=Sat isn't supported by ICU -> 'w' means week number of year
+            'ccc' => 'D',
+            'cccc' => 'l',
+            'ccccc' => '',
+            'cccccc' => '',
+            'a' => 'A',     // AM/PM marker
+            'h' => 'g',     // 12-hour format of an hour without leading zeros 1 to 12h
+            'hh' => 'h',    // 12-hour format of an hour with leading zeros, 01 to 12 h
+            'H' => 'G',     // 24-hour format of an hour without leading zeros 0 to 23h
+            'HH' => 'H',    // 24-hour format of an hour with leading zeros, 00 to 23 h
+            'k' => '',      // hour in day (1~24)
+            'kk' => '',     // hour in day (1~24)
+            'K' => '',      // hour in am/pm (0~11)
+            'KK' => '',     // hour in am/pm (0~11)
+            'm' => 'i',     // Minutes without leading zeros, not supported by php but we fallback
+            'mm' => 'i',    // Minutes with leading zeros
+            's' => 's',     // Seconds, without leading zeros, not supported by php but we fallback
+            'ss' => 's',    // Seconds, with leading zeros
+            'S' => '',      // fractional second
+            'SS' => '',     // fractional second
+            'SSS' => '',    // fractional second
+            'SSSS' => '',   // fractional second
+            'A' => '',      // milliseconds in day
+            'z' => 'T',     // Timezone abbreviation
+            'zz' => 'T',    // Timezone abbreviation
+            'zzz' => 'T',   // Timezone abbreviation
+            'zzzz' => 'T',  // Timezone full name, not supported by php but we fallback
+            'Z' => 'O',     // Difference to Greenwich time (GMT) in hours
+            'ZZ' => 'O',    // Difference to Greenwich time (GMT) in hours
+            'ZZZ' => 'O',   // Difference to Greenwich time (GMT) in hours
+            'ZZZZ' => '\G\M\TP', // Time Zone: long localized GMT (=OOOO) e.g. GMT-08:00
+            'ZZZZZ' => '',  //  TIme Zone: ISO8601 extended hms? (=XXXXX)
+            'O' => '',      // Time Zone: short localized GMT e.g. GMT-8
+            'OOOO' => '\G\M\TP', //  Time Zone: long localized GMT (=ZZZZ) e.g. GMT-08:00
+            'v' => '\G\M\TP', // Time Zone: generic non-location (falls back first to VVVV and then to OOOO) using the ICU defined fallback here
+            'vvvv' => '\G\M\TP', // Time Zone: generic non-location (falls back first to VVVV and then to OOOO) using the ICU defined fallback here
+            'V' => '',      // Time Zone: short time zone ID
+            'VV' => 'e',    // Time Zone: long time zone ID
+            'VVV' => '',    // Time Zone: time zone exemplar city
+            'VVVV' => '\G\M\TP', // Time Zone: generic location (falls back to OOOO) using the ICU defined fallback here
+            'X' => '',      // Time Zone: ISO8601 basic hm?, with Z for 0, e.g. -08, +0530, Z
+            'XX' => 'O, \Z', // Time Zone: ISO8601 basic hm, with Z, e.g. -0800, Z
+            'XXX' => 'P, \Z',    // Time Zone: ISO8601 extended hm, with Z, e.g. -08:00, Z
+            'XXXX' => '',   // Time Zone: ISO8601 basic hms?, with Z, e.g. -0800, -075258, Z
+            'XXXXX' => '',  // Time Zone: ISO8601 extended hms?, with Z, e.g. -08:00, -07:52:58, Z
+            'x' => '',      // Time Zone: ISO8601 basic hm?, without Z for 0, e.g. -08, +0530
+            'xx' => 'O',    // Time Zone: ISO8601 basic hm, without Z, e.g. -0800
+            'xxx' => 'P',   // Time Zone: ISO8601 extended hm, without Z, e.g. -08:00
+            'xxxx' => '',   // Time Zone: ISO8601 basic hms?, without Z, e.g. -0800, -075258
+            'xxxxx' => '',  // Time Zone: ISO8601 extended hms?, without Z, e.g. -08:00, -07:52:58
+        ]));
+    }
+
 }
