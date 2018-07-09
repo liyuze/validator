@@ -39,25 +39,25 @@ class DatetimeValidator extends Validator
     public $format;
 
     /**
-     * @var string|int 时间范围最小值，可以是时间戳或与format对应的日期时间字符串
+     * @var string|int 时间范围开始时间值，可以是时间戳或与format对应的日期时间字符串
      */
-    public $min;
+    public $start;
 
     /**
-     * @var string|int 时间范围最大值，可以是时间戳或与format对应的日期时间字符串
+     * @var string|int 时间范围结束时间值，可以是时间戳或与format对应的日期时间字符串
      */
-    public $max;
+    public $end;
 
 
     /**
-     * @var string|int min 原始值
+     * @var string|int start 原始值
      */
-    private $_minString;
+    private $_startString;
 
     /**
-     * @var string|int max 原始值
+     * @var string|int end 原始值
      */
-    private $_maxString;
+    private $_endString;
 
     /**
      * @var string 时区
@@ -115,8 +115,8 @@ class DatetimeValidator extends Validator
      * @var string 错误消息
      */
     public $message = '';
-    public $messageMin = '';
-    public $messageMax = '';
+    public $messageStart = '';
+    public $messageEnd = '';
 
     /**
      * DatetimeValidator constructor.
@@ -133,28 +133,28 @@ class DatetimeValidator extends Validator
         if (empty($this->format))
         throw new InvalidConfigException('The "format" property must be set.');
 
-        $this->_minString = (string)$this->min;
-        $this->_maxString = (string)$this->max;
+        $this->_startString = (string)$this->start;
+        $this->_endString = (string)$this->end;
 
-        if ($this->min !== null && is_string($this->min)) {
-            $timestamp = $this->parseStrToTimestamp($this->min);
+        if ($this->start !== null && is_string($this->start)) {
+            $timestamp = $this->parseStrToTimestamp($this->start);
             if ($timestamp === false) {
-                throw new InvalidConfigException("Invalid min date value: {$this->min}");
+                throw new InvalidConfigException("Invalid start value: {$this->start}");
             }
-            $this->min = $timestamp;
+            $this->start = $timestamp;
         }
 
-        if ($this->max !== null && is_string($this->max)) {
-            $timestamp = $this->parseStrToTimestamp($this->max);
+        if ($this->end !== null && is_string($this->end)) {
+            $timestamp = $this->parseStrToTimestamp($this->end);
             if ($timestamp === false) {
-                throw new InvalidConfigException("Invalid max date value: {$this->max}");
+                throw new InvalidConfigException("Invalid end value: {$this->end}");
             }
-            $this->max = $timestamp;
+            $this->end = $timestamp;
         }
 
         $this->message == '' && $this->message = '{param_name}的值不是有效的时间值。';
-        $this->messageMin == '' && $this->messageMin = '{param_name}的值不能早于{min}。';
-        $this->messageMax == '' && $this->messageMax = '{param_name}的值不能晚于{max}。';
+        $this->messageStart == '' && $this->messageStart = '{param_name}的值不能早于{start}。';
+        $this->messageEnd == '' && $this->messageEnd = '{param_name}的值不能晚于{end}。';
     }
 
     /**
@@ -169,10 +169,10 @@ class DatetimeValidator extends Validator
         $timestamp = $this->parseStrToTimestamp($value);
         if ($timestamp === false) {
             $this->addError($parameter, $this->message);
-        } elseif ($this->max !== null && $timestamp > $this->max) {
-            $this->addError($parameter, $this->messageMax, ['max' => $this->_maxString]);
-        } elseif ($this->min !== null && $timestamp < $this->min) {
-            $this->addError($parameter, $this->messageMin, ['min' => $this->_minString]);
+        } elseif ($this->start !== null && $timestamp < $this->start) {
+            $this->addError($parameter, $this->messageStart, ['start' => $this->_startString]);
+        } elseif ($this->end !== null && $timestamp > $this->end) {
+            $this->addError($parameter, $this->messageEnd, ['end' => $this->_endString]);
         }
 
         return true;
@@ -188,10 +188,10 @@ class DatetimeValidator extends Validator
         $timestamp = $this->parseStrToTimestamp($value);
         if ($timestamp === false) {
             return $this->message;
-        } elseif ($this->max !== null && $timestamp > $this->max) {
-            return [$this->messageMax, ['max' => $this->_maxString]];
-        } elseif ($this->min !== null && $timestamp < $this->min) {
-            return [$this->messageMin, ['min' => $this->_minString]];
+        } elseif ($this->start !== null && $timestamp < $this->start) {
+            return [$this->messageStart, ['start' => $this->_startString]];
+        } elseif ($this->end !== null && $timestamp > $this->end) {
+            return [$this->messageEnd, ['end' => $this->_endString]];
         }
 
         return true;
