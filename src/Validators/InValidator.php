@@ -20,7 +20,7 @@ class InValidator extends Validator
     /**
      * @var bool 验证模式，当为 true 时验证值和类型全部相等。默认 true。
      */
-    public $strict = false;
+    public $strict = true;
 
     /**
      * @var bool 不在给定的范围内。
