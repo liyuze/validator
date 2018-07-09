@@ -1,10 +1,12 @@
 <?php
 namespace liyuze\validator\tests;
 
+use liyuze\validator\Exceptions\InvalidArgumentException;
 use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 use liyuze\validator\Parameters\Parameters;
 use liyuze\validator\Validators\BooleanValidator;
+use liyuze\validator\Validators\CallableValidator;
 use liyuze\validator\Validators\Validator;
 use liyuze\validator\Validators\ValidatorCreator;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +26,7 @@ class ValidatorCreatorTest extends TestCase
     public function testCreate()
     {
         $validatorCreator = new ValidatorCreator();
+        //内置验证器
         $built_in_validators = $this->getPrivateProperty($validatorCreator, 'built_in_validators');
         $exists = true;
         foreach ($built_in_validators as $v) {
@@ -33,61 +36,70 @@ class ValidatorCreatorTest extends TestCase
             }
         }
         $this->assertTrue($exists);
+    }
 
+    /**
+     * @covers ::create()
+     */
+    public function testDiy()
+    {
+        $validatorCreator = new ValidatorCreator();
+        //diy验证器
         $booleanValidator = $validatorCreator::create(BooleanValidator::class);
-        var_dump($booleanValidator);die;
-
+        $this->assertInstanceOf(Validator::class, $booleanValidator);
     }
+
+    /**
+     * @covers ::create()
+     */
+    public function testMethod()
+    {
+        $validatorCreator = new ValidatorCreator();
+        //方法
+        $obj = new self();
+        $booleanValidator = $validatorCreator::create([$obj, 'methodForTest']);
+        $this->assertInstanceOf(CallableValidator::class, $booleanValidator);
+        $booleanValidator = $validatorCreator::create([$obj, 'staticMethodForTest']);
+        $this->assertInstanceOf(CallableValidator::class, $booleanValidator);
+        $booleanValidator = $validatorCreator::create([self::class, 'staticMethodForTest']);
+        $this->assertInstanceOf(CallableValidator::class, $booleanValidator);
+    }
+
+    /**
+     * @covers ::create()
+     */
+    public function testFunction()
+    {
+        $validatorCreator = new ValidatorCreator();
+        //函数
+        $booleanValidator = $validatorCreator::create(__NAMESPACE__.'\funcForTest');
+        $this->assertInstanceOf(CallableValidator::class, $booleanValidator);
+    }
+
+    /**
+     * @covers ::create()
+     */
+    public function testAnonymous()
+    {
+        $validatorCreator = new ValidatorCreator();
+        //匿名函数
+        $booleanValidator = $validatorCreator::create(function () {});
+        $this->assertInstanceOf(CallableValidator::class, $booleanValidator);
+    }
+
+    /**
+     * @covers ::create()
+     * @expectedException liyuze\validator\Exceptions\InvalidArgumentException
+     */
+    public function testThrow()
+    {
+        $validatorCreator = new ValidatorCreator();
+        $booleanValidator = $validatorCreator::create([]);
+    }
+
+    public function methodForTest(){}
+    public function staticMethodForTest(){}
 
 }
 
-class MultiplierValidator extends Validator {
-
-    protected $_name = 'multiplier';
-
-    /**
-     * @var string 错误消息
-     */
-    public $message;
-
-    /**
-     * @var integer|float 基础数
-     */
-    public $number;
-
-    /**
-     * EqString constructor.
-     * @param array $config
-     * @throws InvalidConfigException
-     */
-    public function __construct(array $config = [])
-    {
-        parent::__construct($config);
-
-        if ($this->number === null) {
-            throw new InvalidConfigException('The "number" property must be set.');
-        }
-
-        if (!is_numeric($this->number)) {
-            throw new InvalidConfigException('The "number" property must be number type.');
-        }
-
-        $this->message === null && $this->message = '{param_name}的值必须是{number}的倍数';
-    }
-
-    protected function _validateParam(Parameter $parameter)
-    {
-        $value = $parameter->getValue();
-        if ($value % $this->number !== 0) {
-            $this->addError($parameter, $this->message, ['number' => $this->number]);
-        }
-    }
-
-    protected function _validateValue($value)
-    {
-        if ($value % $this->number !== 0) {
-            return [$this->message, ['number' => $this->number]];
-        }
-    }
-
-}
+function funcForTest(){}

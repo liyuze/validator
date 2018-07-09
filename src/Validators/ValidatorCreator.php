@@ -49,26 +49,35 @@ class ValidatorCreator
      */
     public static function create($validator, $params = [])
     {
-        if (key_exists($validator, self::$built_in_validators)) {
-            $config = (array)self::$built_in_validators[$validator];
-            $params = array_merge($params, array_slice($config, 1));
-            return new $config[0]($params);
+        if (is_string($validator)) {
+            //内置验证器
+            if (key_exists($validator, self::$built_in_validators)) {
+                $config = (array)self::$built_in_validators[$validator];
+                $params = array_merge($params, array_slice($config, 1));
+                return new $config[0]($params);
 
-        //自定义验证器
-        } elseif (class_exists($validator)) {
-            $object = new $validator($params);
-            if (!($object instanceof Validator)) {
-                throw new InvalidArgumentException('');
+            //自定义验证器
+            } elseif (class_exists($validator)) {
+                $object = new $validator($params);
+                if (!($object instanceof Validator)) {
+                    throw new InvalidArgumentException('');
+                }
+                return $object;
+
+            //函数或类方法
+            } elseif (function_exists($validator)) {
+                return new CallableValidator(['method' => $validator]);
             }
-            return $object;
 
-        //可调用函数
-        } elseif ($validator instanceof \Closure || (is_string($validator) && function_exists($validator))) {
+        //匿名函数
+        } elseif (is_array($validator) && count($validator) == 2 && method_exists($validator[0], $validator[1])) {
+            return new CallableValidator(['method' => $validator[1], 'target' => $validator[0]]);
+
+        //匿名函数
+        } elseif ($validator instanceof \Closure) {
             return new CallableValidator(['method' => $validator]);
-
-        //错误
-        } else {
-
         }
+
+        throw new InvalidArgumentException('Invalid validator value.');
     }
 }
