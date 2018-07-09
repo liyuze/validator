@@ -6,7 +6,7 @@ use liyuze\validator\Exceptions\Exception;
 use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 
-class DateTimeValidator extends Validator
+class DatetimeValidator extends Validator
 {
     const TYPE_DATETIME = 'datetime';
     const TYPE_DATE     = 'date';
@@ -119,7 +119,7 @@ class DateTimeValidator extends Validator
     public $messageMax = '';
 
     /**
-     * DateTimeValidator constructor.
+     * DatetimeValidator constructor.
      * @param array $config
      * @throws InvalidConfigException
      */
