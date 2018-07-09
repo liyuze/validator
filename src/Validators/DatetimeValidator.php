@@ -62,7 +62,7 @@ class DatetimeValidator extends Validator
     /**
      * @var string 时区
      */
-    public $timeZone = 'Asia/Shanghai';
+    public $timezone = 'Asia/Shanghai';
 
     /**
      * @var string 本地化
@@ -227,15 +227,15 @@ class DatetimeValidator extends Validator
     {
         if (isset(self::$_dateFormats[$format])) {
             if ($this->type === self::TYPE_DATE) {
-                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], \IntlDateFormatter::NONE, $this->timeZone);
+                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], \IntlDateFormatter::NONE, $this->timezone);
             } elseif ($this->type === self::TYPE_DATETIME) {
-                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], self::$_dateFormats[$format], $this->timeZone);
+                $formatter = new \IntlDateFormatter($this->locale, self::$_dateFormats[$format], self::$_dateFormats[$format], $this->timezone);
             } else {   //self::TYPE_TIME
-                $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, self::$_dateFormats[$format], $this->timeZone);
+                $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, self::$_dateFormats[$format], $this->timezone);
             }
         } else {
             $hasTimeInfo = (strpbrk($format, 'ahHkKmsSA') !== false);
-            $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, $hasTimeInfo ? $this->timeZone : 'UTC', null, $format);
+            $formatter = new \IntlDateFormatter($this->locale, \IntlDateFormatter::NONE, \IntlDateFormatter::NONE, $hasTimeInfo ? $this->timezone : 'UTC', null, $format);
         }
         // 开启严格验证模式
         $formatter->setLenient(false);
@@ -261,7 +261,7 @@ class DatetimeValidator extends Validator
     {
         $hasTimePart = (strpbrk($format, 'HhGgisU') !== false);
 
-        $timezone = $this->timeZone !== null ? new \DateTimeZone($this->timeZone): null;
+        $timezone = $this->timezone !== null ? new \DateTimeZone($this->timezone): null;
         $datetime = \DateTime::createFromFormat($format, $value, $timezone);
         $errors = \DateTime::getLastErrors();
         if ($datetime === false || $errors['error_count'])
