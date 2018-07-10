@@ -13,11 +13,15 @@ class CallableValidator extends Validator
     protected $_name = 'callable';
 
     /**
-     * @var string|\Closure 匿名方法、函数名称或一个类或对象的方法名称
+     * @var string|array|\Closure 函数名称、一个类或对象的方法名称或匿名函数
      * 示例和参数列表:
      *
      * ```php
+     * //通过 Parameters 对象调用 validateParam()
      * function foo($value, $parameter, $methodValidator)
+     *
+     * //直接通过 Validator 对象调用 validateValue()
+     * function foo($value)
      * ```
      *
      * - `$value` 参数的值;
@@ -28,11 +32,6 @@ class CallableValidator extends Validator
     public $method;
 
     /**
-     * @var \stdClass|string 调用的对象或类
-     */
-    public $target;
-
-    /**
      * CompareValidator constructor.
      * @param array $config
      * @throws InvalidConfigException
@@ -41,19 +40,13 @@ class CallableValidator extends Validator
     {
         parent::__construct($config);
 
-        if ($this->target !== null) {
-            if (!is_object($this->target) && !class_exists($this->target))
-                throw new InvalidConfigException('Invalid target value.');
-            elseif (!method_exists($this->target, $this->method))
-                throw new InvalidConfigException('Invalid method value.');
-        } else {
-            if ($this->method === null) {
-                throw new InvalidConfigException('The "method" property must be set.');
-            } elseif (!$this->method instanceof \Closure &&
-                !(is_string($this->method) && function_exists($this->method))) {
-                throw new InvalidConfigException('Invalid method value.');
-            }
-        }
+        if ($this->method === null)
+            throw new InvalidConfigException('The "method" property must be set.');
+
+        if ((is_string($this->method) && !function_exists($this->method)) ||        //函数
+            (is_object($this->method) && !($this->method instanceof \Closure)) ||   //匿名函数
+            (is_array($this->method) && count($this->method) > 1 && !method_exists($this->method[0], $this->method[1])))    //类或对象的方法
+            throw new InvalidConfigException('Invalid method value.');
     }
 
     /**
@@ -65,12 +58,7 @@ class CallableValidator extends Validator
     {
         $value = $parameter->getValue();
 
-        $method = $this->method;
-        if (is_string($method))  {
-            if ($this->target !== null)
-                $method = [$this->target, $this->method];
-        }
-        call_user_func($method, $value, $parameter, $this);
+        call_user_func($this->method, $value, $parameter, $this);
 
         return true;
     }
@@ -82,13 +70,6 @@ class CallableValidator extends Validator
      */
     protected function _validateValue($value)
     {
-        $method = $this->method;
-        if (is_string($method))  {
-            if ($this->target !== null)
-                $method = [$this->target, $this->method];
-        }
-        call_user_func($method, $value);
-
-        return true;
+        return call_user_func($this->method, $value);
     }
 }
