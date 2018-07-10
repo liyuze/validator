@@ -184,43 +184,43 @@ class CallableValidatorTest extends TestCase
 
     /**
      * @param $value
-     * @param $parameter
-     * @param $methodValidator
+     * @param $Parameter
+     * @param $Validator
      * @return boolean
      */
-    public function isInt($value, $parameter, $methodValidator)
+    public function isInt($value, $Parameter, $Validator)
     {
         if (!is_int($value)) {
-            $methodValidator->addError($parameter, '输入的值不是一个整数');
+            $Validator->addError($Parameter, '输入的值不是一个整数');
         }
         return true;
     }
 
     /**
      * @param $value
-     * @param $parameter
-     * @param $methodValidator
+     * @param $Parameter
+     * @param $Validator
      * @return boolean
      */
-    public static function isBoolean($value, $parameter, $methodValidator)
+    public static function isBoolean($value, $Parameter, $Validator)
     {
         if (!is_bool($value)) {
-            $methodValidator->addError($parameter, '输入的值不是一个布尔值');
+            $Validator->addError($Parameter, '输入的值不是一个布尔值');
         }
         return true;
     }
 
     /**
      * @param $value
-     * @param $parameter
-     * @param $methodValidator
+     * @param $Parameter
+     * @param $Validator
      * @param $params
      * @return boolean
      */
-    public static function eqValue($value, $parameter, $methodValidator, $params)
+    public static function eqValue($value, $Parameter, $Validator, $params)
     {
         if ($value != $params) {
-            $methodValidator->addError($parameter, '{param_name}的值不等于{value}', ['value' => $params]);
+            $Validator->addError($Parameter, '{param_name}的值不等于{value}', ['value' => $params]);
         }
         return true;
     }
@@ -263,10 +263,10 @@ class CallableValidatorTest extends TestCase
     }
 }
 
-function isString($value, $parameter, $methodValidator)
+function isString($value, $Parameter, $Validator)
 {
     if (!is_string($value)) {
-        $methodValidator->addError($parameter, '输入的值不是一个字符串');
+        $Validator->addError($Parameter, '输入的值不是一个字符串');
     }
 }
 
