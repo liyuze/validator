@@ -32,6 +32,7 @@ class CallableValidatorTest extends TestCase
                     $methodValidator->addError($parameter, '输入的值不是一个Closure');
                 }
             }]],
+            'param_5' => [100, ['callable', 'method' => [self::class, 'eqValue'], 'param' => 100]],
         ], true);
     }
 
@@ -130,6 +131,29 @@ class CallableValidatorTest extends TestCase
         $this->assertEquals('输入的值不是一个Closure', $error);
     }
 
+
+    /**
+     * @covers ::validateParam()
+     * @covers ::validate()
+     */
+    public function testParam()
+    {
+        $param_name = 'param_5';
+        $parameters = $this->_parameters;
+        $parameters->validate();
+        $this->assertFalse($parameters->hasError($param_name));
+        $parameters->setParamsValue($param_name, 'error');
+        $parameters->validate();
+        $this->assertTrue($parameters->hasError($param_name));
+        $this->assertEquals('param_5的值不等于100', $parameters->getFirstErrorMessage($param_name));
+
+        $validator = new CallableValidator(['method' => [self::class, 'eqValue2'], 'param' => 100]);
+        $error = '';
+        $this->assertTrue($validator->validate(100, $error));
+        $this->assertFalse($validator->validate('string', $error));
+        $this->assertEquals('该输入的值不等于100', $error);
+    }
+
     /**
      * @covers ::validateParam()
      * @covers ::validate()
@@ -162,26 +186,44 @@ class CallableValidatorTest extends TestCase
      * @param $value
      * @param $parameter
      * @param $methodValidator
+     * @return boolean
      */
     public function isInt($value, $parameter, $methodValidator)
     {
         if (!is_int($value)) {
             $methodValidator->addError($parameter, '输入的值不是一个整数');
         }
+        return true;
     }
 
     /**
      * @param $value
      * @param $parameter
      * @param $methodValidator
+     * @return boolean
      */
     public static function isBoolean($value, $parameter, $methodValidator)
     {
         if (!is_bool($value)) {
             $methodValidator->addError($parameter, '输入的值不是一个布尔值');
         }
+        return true;
     }
 
+    /**
+     * @param $value
+     * @param $parameter
+     * @param $methodValidator
+     * @param $params
+     * @return boolean
+     */
+    public static function eqValue($value, $parameter, $methodValidator, $params)
+    {
+        if ($value != $params) {
+            $methodValidator->addError($parameter, '{param_name}的值不等于{value}', ['value' => $params]);
+        }
+        return true;
+    }
 
     /**
      * @param $value
@@ -207,6 +249,18 @@ class CallableValidatorTest extends TestCase
         return true;
     }
 
+    /**
+     * @param $value
+     * @param $params
+     * @return boolean
+     */
+    public static function eqValue2($value, $params)
+    {
+        if ($value != $params) {
+            return ['{param_name}的值不等于{value}', ['value' => $params]];
+        }
+        return true;
+    }
 }
 
 function isString($value, $parameter, $methodValidator)

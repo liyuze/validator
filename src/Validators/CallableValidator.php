@@ -18,18 +18,24 @@ class CallableValidator extends Validator
      *
      * ```php
      * //通过 Parameters 对象调用 validateParam()
-     * function foo($value, $parameter, $methodValidator)
+     * function foo($value, $parameter, $methodValidator, $param)
      *
      * //直接通过 Validator 对象调用 validateValue()
-     * function foo($value)
+     * function foo($value, $param)
      * ```
      *
      * - `$value` 参数的值;
      * - `$parameter` 参数的对象;
      * - `$methodValidator` 方法验证器的对象 $this.
+     * - `$param` 方法的其他参数.
      */
 
     public $method;
+
+    /**
+     * @var mixed callable 的其他参数。
+     */
+    public $param;
 
     /**
      * CompareValidator constructor.
@@ -58,7 +64,7 @@ class CallableValidator extends Validator
     {
         $value = $parameter->getValue();
 
-        call_user_func($this->method, $value, $parameter, $this);
+        call_user_func($this->method, $value, $parameter, $this, $this->param);
 
         return true;
     }
@@ -70,6 +76,6 @@ class CallableValidator extends Validator
      */
     protected function _validateValue($value)
     {
-        return call_user_func($this->method, $value);
+        return call_user_func($this->method, $value, $this->param);
     }
 }
