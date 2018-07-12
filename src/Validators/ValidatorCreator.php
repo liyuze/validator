@@ -27,6 +27,7 @@ class ValidatorCreator
 
         'email'     => '\liyuze\validator\Validators\EmailValidator',
         'url'       => '\liyuze\validator\Validators\UrlValidator',
+        'id_card'   => '\liyuze\validator\Validators\IDCardValidator',
         'file'      => '\liyuze\validator\Validators\FileValidator',
         'image'     => '\liyuze\validator\Validators\ImageValidator',
         'upload_file'  => '\liyuze\validator\Validators\UploadFileValidator',
