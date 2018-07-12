@@ -35,7 +35,7 @@ class BooleanValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}必须是 "{true}" 或 "{false}"。';
+        $this->message == '' && $this->message = '{param_name}的值必须是 "{true}" 或 "{false}"。';
     }
 
     /**

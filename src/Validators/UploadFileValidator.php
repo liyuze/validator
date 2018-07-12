@@ -50,7 +50,7 @@ class UploadFileValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}不是上传文件。';
+        $this->message == '' && $this->message = '{param_name}的值不是上传文件的格式。';
         $this->messageMinSize == '' && $this->messageMinSize = '{param_name}{file_name}文件大小不能低于{min_size}。';
         $this->messageMaxSize == '' && $this->messageMaxSize = '{param_name}{file_name}文件大小不能超过{max_size}。';
         $this->messageExtensions == '' && $this->messageExtensions  = '{param_name}{file_name}文件只支持以下后缀名：{extensions}。';

@@ -24,7 +24,7 @@ class BooleanValidatorTest extends TestCase
         $this->assertTrue($validator->validate(true, $error));
         $this->assertTrue($validator->validate(false, $error));
         $this->assertFalse($validator->validate(1, $error));
-        $this->assertEquals('该输入必须是 "true" 或 "false"。', $error);
+        $this->assertEquals('该输入的值必须是 "true" 或 "false"。', $error);
 
 
         $parameters = new Parameters();
@@ -42,7 +42,7 @@ class BooleanValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, 1);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals($param_name.'必须是 "true" 或 "false"。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须是 "true" 或 "false"。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**

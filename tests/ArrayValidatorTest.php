@@ -23,7 +23,7 @@ class ArrayValidatorTest extends TestCase
         $error = '';
         $this->assertTrue($validator->validate([1,2,3], $error));
         $this->assertFalse($validator->validate(1, $error));
-        $this->assertEquals('该输入必须是数组类型。', $error);
+        $this->assertEquals('该输入的值必须是数组类型。', $error);
 
 
         $parameters = new Parameters();
@@ -36,7 +36,7 @@ class ArrayValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, 'string');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals($param_name.'必须是数组类型。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须是数组类型。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
@@ -50,7 +50,7 @@ class ArrayValidatorTest extends TestCase
         $error = '';
         $this->assertTrue($validator->validate(['a','b'], $error));
         $this->assertFalse($validator->validate(['a' => 1, 'b' => 2], $error));
-        $this->assertEquals('该输入的key值的格式不正确。', $error);
+        $this->assertEquals('该输入的值的key值的格式不正确。', $error);
 
 
         $parameters = new Parameters();
@@ -63,7 +63,7 @@ class ArrayValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, ['a' => 1, 'b' => 2]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals($param_name.'的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
@@ -77,7 +77,7 @@ class ArrayValidatorTest extends TestCase
         $error = '';
         $this->assertTrue($validator->validate(['a','b'], $error));
         $this->assertFalse($validator->validate(['a' => false, 'b' => false], $error));
-        $this->assertEquals('该输入的value值的格式不正确。', $error);
+        $this->assertEquals('该输入的值的value值的格式不正确。', $error);
 
 
         $parameters = new Parameters();
@@ -90,6 +90,6 @@ class ArrayValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, ['a' => false, 'b' => false]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals($param_name.'的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 }

@@ -50,9 +50,9 @@ class ArrayValidator extends Validator
     {
         parent::__construct($config);
 
-        $this->message == '' && $this->message = '{param_name}必须是数组类型。';
-        $this->messageKey == '' && $this->messageKey = '{param_name}的key值的格式不正确。';
-        $this->messageValue == '' && $this->messageValue = '{param_name}的value值的格式不正确。';
+        $this->message == '' && $this->message = '{param_name}的值必须是数组类型。';
+        $this->messageKey == '' && $this->messageKey = '{param_name}的值的key值的格式不正确。';
+        $this->messageValue == '' && $this->messageValue = '{param_name}的值的value值的格式不正确。';
     }
 
     /**
