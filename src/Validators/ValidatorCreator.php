@@ -65,14 +65,14 @@ class ValidatorCreator
                 }
                 return $object;
 
-            //函数或类方法
+            //函数
             } elseif (function_exists($validator)) {
                 return new CallableValidator(['method' => $validator]);
             }
 
-        //匿名函数
+        //类或对象的方法
         } elseif (is_array($validator) && count($validator) == 2 && method_exists($validator[0], $validator[1])) {
-            return new CallableValidator(['method' => $validator[1], 'target' => $validator[0]]);
+            return new CallableValidator(['method' => $validator]);
 
         //匿名函数
         } elseif ($validator instanceof \Closure) {
