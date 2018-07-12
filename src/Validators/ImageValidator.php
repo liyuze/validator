@@ -9,9 +9,24 @@ class ImageValidator extends FileValidator
 {
     protected $_name = 'image';
 
+    /**
+     * @var int 最小宽度
+     */
     public $minWidth;
+
+    /**
+     * @var int 最大宽度
+     */
     public $maxWidth;
+
+    /**
+     * @var int 最小高度
+     */
     public $minHeight;
+
+    /**
+     * @var int 最大高度
+     */
     public $maxHeight;
 
     /**

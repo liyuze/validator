@@ -25,11 +25,23 @@ class UploadFileValidator extends Validator
     public $isImage = false;
 
     /**
-     * @var integer 图片尺寸
+     * @var int 图片最小宽度
      */
     public $minWidth;
+
+    /**
+     * @var int 图片最大宽度
+     */
     public $maxWidth;
+
+    /**
+     * @var int 图片最小高度
+     */
     public $minHeight;
+
+    /**
+     * @var int 图片最大高度
+     */
     public $maxHeight;
 
     /**
