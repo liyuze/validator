@@ -3,11 +3,17 @@ namespace liyuze\validator\tests;
 
 use liyuze\validator\Exceptions\Exception;
 
+/**
+ * 反射
+ * Trait ReflectionTrait
+ * @package liyuze\validator\tests
+ */
 trait ReflectionTrait
 {
     /**
-     * @param $object
-     * @param string $property
+     * 获取私有属性
+     * @param \stdClass $object 对象
+     * @param string $property 属性名称
      * @return mixed
      */
     public function getPrivateProperty($object, $property)
@@ -23,7 +29,8 @@ trait ReflectionTrait
     }
 
     /**
-     * @param $object
+     * 设置私有属性
+     * @param \stdClass $object 对象
      * @param string $property
      * @param mixed $value
      * @return mixed
@@ -40,6 +47,13 @@ trait ReflectionTrait
         $_property->setValue($object, $value);
     }
 
+    /**
+     * 调用私有方法
+     * @param string|\stdClass $Object 对象或类
+     * @param string $method 方法名称
+     * @param array $args 参数
+     * @return bool|mixed
+     */
     protected function callPrivateMethod($Object, $method, $args = [])
     {
         try {
