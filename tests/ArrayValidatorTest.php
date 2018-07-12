@@ -13,21 +13,7 @@ use PHPUnit\Framework\TestCase;
 class ArrayValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [[1], 'array'],
-            'param_2' => [['a', 'b'], ['array', 'keyValidateConfig' => 'integer']],
-            'param_3' => [['a', 'b'], ['array', 'valueValidateConfig' => 'string']],
-        ], true);
-    }
-
-    /**
+     * 测试数组类型
      * @covers ::validate()
      * @covers ::validateParam()
      */
@@ -39,17 +25,22 @@ class ArrayValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1, $error));
         $this->assertEquals('该输入必须是数组类型。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [[1], 'array'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'string');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1必须是数组类型。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'必须是数组类型。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试数组key的验证配置
      * @covers ::validate()
      * @covers ::validateParam()
      */
@@ -61,17 +52,22 @@ class ArrayValidatorTest extends TestCase
         $this->assertFalse($validator->validate(['a' => 1, 'b' => 2], $error));
         $this->assertEquals('该输入的key值的格式不正确。', $error);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [['a', 'b'], ['array', 'keyValidateConfig' => 'integer']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, ['a' => 1, 'b' => 2]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_2的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的key值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试数组value的验证配置
      * @covers ::validate()
      * @covers ::validateParam()
      */
@@ -83,13 +79,17 @@ class ArrayValidatorTest extends TestCase
         $this->assertFalse($validator->validate(['a' => false, 'b' => false], $error));
         $this->assertEquals('该输入的value值的格式不正确。', $error);
 
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [['a', 'b'], ['array', 'valueValidateConfig' => 'string']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, ['a' => false, 'b' => false]);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_3的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的value值的格式不正确。', $parameters->getFirstErrorMessage($param_name));
     }
 }

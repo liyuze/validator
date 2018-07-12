@@ -13,20 +13,6 @@ use PHPUnit\Framework\TestCase;
 class EmailValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['290315384@qq.com', 'email'],
-            'param_2' => ['liyuze <290315384@qq.com>', ['email', 'allowName' => true]],
-        ], true);
-    }
-
-    /**
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -38,14 +24,18 @@ class EmailValidatorTest extends TestCase
         $this->assertFalse($validator->validate('290315384qq.com', $error));
         $this->assertEquals('该输入的值不是有效的Email。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['290315384@qq.com', 'email'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, '290315384qq.com');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1的值不是有效的Email。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值不是有效的Email。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
@@ -60,14 +50,17 @@ class EmailValidatorTest extends TestCase
         $this->assertFalse($validator->validate('error data', $error));
         $this->assertEquals('该输入的值不是有效的Email。', $error);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['liyuze <290315384@qq.com>', ['email', 'allowName' => true]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error data');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_2的值不是有效的Email。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值不是有效的Email。', $parameters->getFirstErrorMessage($param_name));
     }
-
 }

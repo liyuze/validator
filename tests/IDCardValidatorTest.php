@@ -14,22 +14,7 @@ use PHPUnit\Framework\TestCase;
 class IDCardValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['130423198908152222', ['id_card']],
-            'param_2' => ['130423890815222', ['id_card', 'mustSecondGeneration' => false]],
-            'param_3' => ['13042319890815222x', ['id_card', 'mustSecondGeneration' => false, 'min' => '19850101', 'max' => '19901231']],
-            'param_4' => ['130423199508152222', ['id_card', 'minAge' => '18', 'maxAge' => '25']],
-        ], true);
-    }
-
-    /**
+     * 测试二代身份证的验证
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -41,9 +26,15 @@ class IDCardValidatorTest extends TestCase
         $this->assertTrue($validator->validate(130423198908152222, $error));
         $this->assertFalse($validator->validate(130423000008152222, $error));
         $this->assertEquals('该输入的值不是有效的身份证号。', $error);
+        $this->assertFalse($validator->validate(130423890815222, $error));
+        $this->assertEquals('该输入的值不是有效的身份证号。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['130423198908152222', ['id_card']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, '100000000008152222');
@@ -53,6 +44,7 @@ class IDCardValidatorTest extends TestCase
     }
 
     /**
+     * 测试一代身份证的验证
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -66,8 +58,12 @@ class IDCardValidatorTest extends TestCase
         $this->assertFalse($validator->validate(15988888888, $error));
         $this->assertEquals('该输入的值不是有效的身份证号。', $error);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['130423890815222', ['id_card', 'mustSecondGeneration' => false]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 15988888888);
@@ -77,6 +73,7 @@ class IDCardValidatorTest extends TestCase
     }
 
     /**
+     * 测试出生日期限定
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -92,8 +89,12 @@ class IDCardValidatorTest extends TestCase
         $this->assertFalse($validator->validate(130423199101012222, $error));
         $this->assertEquals('该输入的值不可晚于19901231。', $error);
 
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['13042319890815222x', ['id_card', 'mustSecondGeneration' => false, 'min' => '19850101', 'max' => '19901231']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 130423890815222);
@@ -106,6 +107,7 @@ class IDCardValidatorTest extends TestCase
     }
 
     /**
+     * 测试年龄限定
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -120,8 +122,12 @@ class IDCardValidatorTest extends TestCase
         $this->assertFalse($validator->validate(130423198908152222, $error));
         $this->assertEquals('该输入的值不可大于25周岁。', $error);
 
-        $param_name = 'param_4';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['130423199508152222', ['id_card', 'minAge' => '18', 'maxAge' => '25']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 130423200508152222);

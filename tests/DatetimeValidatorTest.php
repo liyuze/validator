@@ -14,36 +14,18 @@ use PHPUnit\Framework\TestCase;
 class DatetimeValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['2018-07-06 12:12:12', ['datetime', 'format' => 'php:Y-m-d H:i:s',
-                            'start' => '2018-07-06 00:00:00', 'end' => '2018-07-06 23:59:59']],
-            'param_2' => ['2018-07-06', ['date', 'format' => 'php:Y-m-d',
-                            'start' => '2018-07-01', 'end' => '2018-07-31']],
-            'param_3' => ['12:00:00', ['time', 'format' => 'php:H:i:s',
-                            'start' => '06:00:00', 'end' => '18:00:00']],
-            'param_4' => ['2018-07-06', ['date', 'format' => 'yyyy-MM-dd']],
-        ], true);
-    }
-
-    /**
+     * 测试日期+时分秒
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testDateTime()
     {
-        $param_name = 'param_1';
         $start = '2018-07-06 00:00:00';
         $end = '2018-07-06 23:59:59';
         $testValue = '2018-07-06';
         $testStartValue = '2018-07-05 12:12:12';
         $testEndValue = '2018-07-08 12:12:12';
+
 
         $validator = new DateTimeValidator(['format' => 'php:Y-m-d H:i:s', 'start' => $start, 'end' => $end]);
         $error = '';
@@ -55,7 +37,13 @@ class DatetimeValidatorTest extends TestCase
         $this->assertFalse($validator->validate($testEndValue, $error));
         $this->assertEquals('该输入的值不能晚于'.$end.'。', $error);
 
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['2018-07-06 12:12:12', ['datetime', 'format' => 'php:Y-m-d H:i:s',
+                'start' => '2018-07-06 00:00:00', 'end' => '2018-07-06 23:59:59']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, $testValue);
@@ -73,12 +61,12 @@ class DatetimeValidatorTest extends TestCase
     }
 
     /**
+     * 测试日期
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testDate()
     {
-        $param_name = 'param_2';
         $start = '2018-07-01';
         $end = '2018-07-31';
         $testValue = '20180706';
@@ -95,7 +83,13 @@ class DatetimeValidatorTest extends TestCase
         $this->assertFalse($validator->validate($testEndValue, $error));
         $this->assertEquals('该输入的值不能晚于'.$end.'。', $error);
 
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['2018-07-06', ['date', 'format' => 'php:Y-m-d',
+                'start' => '2018-07-01', 'end' => '2018-07-31']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, $testValue);
@@ -113,13 +107,12 @@ class DatetimeValidatorTest extends TestCase
     }
 
     /**
+     * 测试时分秒
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testTime()
     {
-
-        $param_name = 'param_3';
         $start = '06:00:00';
         $end = '18:00:00';
         $testValue = '20180706';
@@ -136,7 +129,13 @@ class DatetimeValidatorTest extends TestCase
         $this->assertFalse($validator->validate($testEndValue, $error));
         $this->assertEquals('该输入的值不能晚于'.$end.'。', $error);
 
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['12:00:00', ['time', 'format' => 'php:H:i:s',
+                'start' => '06:00:00', 'end' => '18:00:00']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, $testValue);
@@ -154,13 +153,12 @@ class DatetimeValidatorTest extends TestCase
     }
 
     /**
+     * 测试 ICU 格式配置
      * @covers ::validateParam()
      * @covers ::validate()
      */
-    public function testIcu()
+    public function testICUFormat()
     {
-
-        $param_name = 'param_4';
         $testValue = '20180706';
 
         $validator = new DateTimeValidator(['format' => 'yyyy-MM-dd']);
@@ -169,7 +167,12 @@ class DatetimeValidatorTest extends TestCase
         $this->assertFalse($validator->validate($testValue, $error));
         $this->assertEquals('该输入的值不是有效的时间值。', $error);
 
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['2018-07-06', ['date', 'format' => 'yyyy-MM-dd']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, $testValue);

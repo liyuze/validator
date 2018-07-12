@@ -13,20 +13,7 @@ use PHPUnit\Framework\TestCase;
 class BooleanValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [true, 'boolean'],
-            'param_2' => [1, ['boolean', 'strict' => false]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -39,8 +26,12 @@ class BooleanValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1, $error));
         $this->assertEquals('该输入必须是 "true" 或 "false"。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [true, 'boolean'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
 
@@ -51,10 +42,11 @@ class BooleanValidatorTest extends TestCase
         $parameters->setParamsValue($param_name, 1);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1必须是 "true" 或 "false"。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'必须是 "true" 或 "false"。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试严格验证
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -65,8 +57,12 @@ class BooleanValidatorTest extends TestCase
         $r = $validator->validate(1, $error);
         $this->assertTrue($r);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [1, ['boolean', 'strict' => false]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
     }

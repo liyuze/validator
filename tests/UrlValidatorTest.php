@@ -13,22 +13,7 @@ use PHPUnit\Framework\TestCase;
 class UrlValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['http://www.baidu.com', 'url'],
-            'param_2' => ['http://www.baidu.coms', ['url', 'patterPart' => [
-                UrlValidator::URL_PROTOCOLS, UrlValidator::URL_DOMAIN, UrlValidator::URL_PORT, '?'
-            ]]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -43,8 +28,12 @@ class UrlValidatorTest extends TestCase
         $this->assertFalse($validator->validate('www.baidu.com', $error));
         $this->assertEquals('该输入的值不是有效的URL。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['http://www.baidu.com', 'url'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error data');
@@ -54,6 +43,7 @@ class UrlValidatorTest extends TestCase
     }
 
     /**
+     * 测试 url 部分限定
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -88,8 +78,14 @@ class UrlValidatorTest extends TestCase
         $this->assertTrue($validator->validate('abc=1&def=2&name=测试', $error));
         $this->assertTrue($validator->validate('abc=1&def=2&name=测试#goods-part', $error));
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['http://www.baidu.coms', ['url', 'patterPart' => [
+                UrlValidator::URL_PROTOCOLS, UrlValidator::URL_DOMAIN, UrlValidator::URL_PORT, '?'
+            ]]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error data');

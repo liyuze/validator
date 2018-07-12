@@ -13,19 +13,7 @@ use PHPUnit\Framework\TestCase;
 class RequiredValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['', 'required'],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -37,8 +25,12 @@ class RequiredValidatorTest extends TestCase
         $this->assertFalse($validator->validate(null, $error));
         $this->assertEquals('该输入的值不能为空。', $error);
 
+
+        $parameters = new Parameters();
         $param_name = 'param_1';
-        $parameters = $this->_parameters;
+        $parameters->config([
+            $param_name => ['', 'required'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, null);

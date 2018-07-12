@@ -15,35 +15,17 @@ use PHPUnit\Framework\TestCase;
 class CallableValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['string', ['callable', 'method' => __NAMESPACE__.'\isString']],
-            'param_2' => [1, ['callable', 'method' => [$this, 'isInt']]],
-            'param_3' => [true, ['callable', 'method' => [self::class, 'isBoolean']]],
-            'param_4' => [function(){}, ['callable', 'method' => function ($value, $parameter, $methodValidator)
-            {
-                if (!($value instanceof \Closure)) {
-                    $methodValidator->addError($parameter, '输入的值不是一个Closure');
-                }
-            }]],
-            'param_5' => [100, ['callable', 'method' => [self::class, 'eqValue'], 'param' => 100]],
-        ], true);
-    }
-
-    /**
+     * 测试函数
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testFunction()
     {
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['string', ['callable', 'method' => __NAMESPACE__.'\isString']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1);
@@ -59,13 +41,17 @@ class CallableValidatorTest extends TestCase
     }
 
     /**
+     * 测试方法
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testMethod()
     {
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [1, ['callable', 'method' => [$this, 'isInt']]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error');
@@ -81,13 +67,17 @@ class CallableValidatorTest extends TestCase
     }
 
     /**
+     * 测试静态方法
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testStaticMethod()
     {
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [true, ['callable', 'method' => [self::class, 'isBoolean']]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error');
@@ -103,13 +93,22 @@ class CallableValidatorTest extends TestCase
     }
 
     /**
+     * 测试匿名函数
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testAnonymousFunction()
     {
-        $param_name = 'param_4';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [function(){}, ['callable', 'method' => function ($value, $parameter, $methodValidator)
+            {
+                if (!($value instanceof \Closure)) {
+                    $methodValidator->addError($parameter, '输入的值不是一个Closure');
+                }
+            }]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error');
@@ -133,19 +132,23 @@ class CallableValidatorTest extends TestCase
 
 
     /**
+     * 测试自定义参数
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testParam()
     {
-        $param_name = 'param_5';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [100, ['callable', 'method' => [self::class, 'eqValue'], 'param' => 100]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_5的值不等于100', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值不等于100', $parameters->getFirstErrorMessage($param_name));
 
         $validator = new CallableValidator(['method' => [self::class, 'eqValue2'], 'param' => 100]);
         $error = '';
@@ -155,14 +158,15 @@ class CallableValidatorTest extends TestCase
     }
 
     /**
+     * 测试昵称
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testException()
     {
         try {
-            $this->_parameters = new Parameters();
-            $this->_parameters->config([
+            $parameters = new Parameters();
+            $parameters->config([
                 'param_1' => ['string', ['callable']],
             ], true);
         } catch (\Exception $e) {

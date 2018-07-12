@@ -13,20 +13,7 @@ use PHPUnit\Framework\TestCase;
 class MatchValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [10, ['match', 'pattern' => '/^\d{2}$/']],
-            'param_2' => [1000, ['match', 'pattern' =>  '/^\d{2}$/', 'not' => true]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -39,8 +26,12 @@ class MatchValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1000, $error));
         $this->assertEquals('该输入的值是无效的。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10, ['match', 'pattern' => '/^\d{2}$/']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1000);
@@ -50,6 +41,7 @@ class MatchValidatorTest extends TestCase
     }
 
     /**
+     * 测试 Not属性
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -62,8 +54,12 @@ class MatchValidatorTest extends TestCase
         $this->assertFalse($validator->validate(10, $error));
         $this->assertEquals('该输入的值是无效的。', $error);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [1000, ['match', 'pattern' =>  '/^\d{2}$/', 'not' => true]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 10);
@@ -73,6 +69,7 @@ class MatchValidatorTest extends TestCase
     }
 
     /**
+     * 测试属性必填
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */

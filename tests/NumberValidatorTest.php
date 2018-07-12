@@ -14,24 +14,7 @@ use PHPUnit\Framework\TestCase;
 class NumberValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [10.2, ['number']],
-            'param_2' => [10, ['integer']],
-            //'param_2' => [10, ['number', 'mustInt' => true]],
-            'param_3' => [10, ['integer', 'max' => 100, 'min' => 1]],
-            'param_4' => [10, ['integer', 'equal' => 10]],
-            'param_5' => [10, ['integer', 'strict' => true]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -44,8 +27,12 @@ class NumberValidatorTest extends TestCase
         $this->assertFalse($validator->validate('10M', $error));
         $this->assertEquals('该输入的值必须是数字。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10.2, ['number']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, '10.2');
@@ -57,6 +44,7 @@ class NumberValidatorTest extends TestCase
     }
 
     /**
+     * 测试 mustInt 属性，值必须是整数功能
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -68,8 +56,13 @@ class NumberValidatorTest extends TestCase
         $this->assertFalse($validator->validate(10.5, $error));
         $this->assertEquals('该输入的值必须是整数。', $error);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10, ['integer']],
+            //$param_name => [10, ['number', 'mustInt' => true]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 10.5);
@@ -79,6 +72,7 @@ class NumberValidatorTest extends TestCase
     }
 
     /**
+     * 测试范围
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -92,8 +86,12 @@ class NumberValidatorTest extends TestCase
         $this->assertFalse($validator->validate(101, $error));
         $this->assertEquals('该输入的值不能大于100。', $error);
 
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10, ['integer', 'max' => 100, 'min' => 1]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 0);
@@ -108,6 +106,7 @@ class NumberValidatorTest extends TestCase
 
 
     /**
+     * 测试相等
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -119,8 +118,12 @@ class NumberValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1, $error));
         $this->assertEquals('该输入的值必须等于10。', $error);
 
-        $param_name = 'param_4';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10, ['integer', 'equal' => 10]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1);
@@ -130,6 +133,7 @@ class NumberValidatorTest extends TestCase
     }
 
     /**
+     * 测试严格数据模式
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -141,8 +145,12 @@ class NumberValidatorTest extends TestCase
         $this->assertFalse($validator->validate('10', $error));
         $this->assertEquals('该输入的值必须是整数。', $error);
 
-        $param_name = 'param_5';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [10, ['integer', 'strict' => true]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, '10');

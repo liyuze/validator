@@ -21,6 +21,7 @@ class ValidatorCreatorTest extends TestCase
     use ReflectionTrait;
 
     /**
+     * 测试内置验证器有效性
      * @covers ::create()
      */
     public function testCreate()
@@ -39,6 +40,7 @@ class ValidatorCreatorTest extends TestCase
     }
 
     /**
+     * 测试diy基层验证器
      * @covers ::create()
      */
     public function testDiy()
@@ -50,6 +52,7 @@ class ValidatorCreatorTest extends TestCase
     }
 
     /**
+     * 测试类或对象方法
      * @covers ::create()
      */
     public function testMethod()
@@ -66,6 +69,7 @@ class ValidatorCreatorTest extends TestCase
     }
 
     /**
+     * 测试函数
      * @covers ::create()
      */
     public function testFunction()
@@ -77,6 +81,7 @@ class ValidatorCreatorTest extends TestCase
     }
 
     /**
+     * 测试匿名函数
      * @covers ::create()
      */
     public function testAnonymous()
@@ -88,6 +93,7 @@ class ValidatorCreatorTest extends TestCase
     }
 
     /**
+     * 测试异常
      * @covers ::create()
      * @expectedException liyuze\validator\Exceptions\InvalidArgumentException
      */
@@ -97,9 +103,19 @@ class ValidatorCreatorTest extends TestCase
         $booleanValidator = $validatorCreator::create([]);
     }
 
+    /**
+     * 测试所用
+     */
     public function methodForTest(){}
-    public function staticMethodForTest(){}
+
+    /**
+     * 测试所用
+     */
+    public static function staticMethodForTest(){}
 
 }
 
+/**
+ * 测试所用
+ */
 function funcForTest(){}

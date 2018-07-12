@@ -13,22 +13,7 @@ use PHPUnit\Framework\TestCase;
 class StringValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => ['1', 'string'],
-            'param_2' => ["55555", ['string', 'minLength' => 5]],
-            'param_3' => ["55555", ['string', 'maxLength' => 5]],
-            'param_4' => ['10', ['string', 'strict' => true]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @covers ::validate()
      * @covers ::validateParam()
      */
@@ -41,8 +26,12 @@ class StringValidatorTest extends TestCase
         $r = $validator->validate(1,$error);
         $this->assertTrue($r);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['1', 'string'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1);
@@ -52,51 +41,39 @@ class StringValidatorTest extends TestCase
     }
 
     /**
+     * 测试字符串长度限定
      * @covers ::validate()
      * @covers ::validateParam()
      */
-    public function testMinLength()
+    public function testLength()
     {
-        $validator = new StringValidator(['minLength' => 5]);
+        $validator = new StringValidator(['minLength' => 2, 'maxLength' => 4]);
         $error = '';
-        $r = $validator->validate("555555",$error);
+        $r = $validator->validate("333",$error);
         $this->assertTrue($r);
-        $r = $validator->validate("4444",$error);
+        $r = $validator->validate("1",$error);
+        $this->assertFalse($r);
+        $r = $validator->validate("55555",$error);
         $this->assertFalse($r);
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ["333", ['string', 'minLength' => 2, 'maxLength' => 4]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
-        $parameters->setParamsValue($param_name, "4444");
+        $parameters->setParamsValue($param_name, "1");
+        $parameters->validate();
+        $this->assertTrue($parameters->hasError($param_name));
+        $parameters->setParamsValue($param_name, "55555");
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
     }
 
     /**
-     * @covers ::validate()
-     * @covers ::validateParam()
-     */
-    public function testMaxLength()
-    {
-        $validator = new StringValidator(['maxLength' => 4]);
-        $error = '';
-        $r = $validator->validate("4444",$error);
-        $this->assertTrue($r);
-        $r = $validator->validate("555555",$error);
-        $this->assertFalse($r);
-
-
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
-        $parameters->validate();
-        $this->assertFalse($parameters->hasError($param_name));
-        $parameters->setParamsValue($param_name, "666666");
-        $parameters->validate();
-        $this->assertTrue($parameters->hasError($param_name));
-    }
-
-    /**
+     * 测试严格验证模式
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -108,8 +85,11 @@ class StringValidatorTest extends TestCase
         $this->assertFalse($validator->validate(10, $error));
         $this->assertEquals('该输入的值必须是字符串。', $error);
 
-        $param_name = 'param_4';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['10', ['string', 'strict' => true]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 10);

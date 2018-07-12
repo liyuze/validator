@@ -13,20 +13,7 @@ use PHPUnit\Framework\TestCase;
 class InValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [3, ['in', 'range' => [3,4]]],
-            'param_2' => ['3', ['in', 'range' => [3,4], 'strict' => false]],
-        ], true);
-    }
-
-    /**
+     * 测试基本功能
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -39,17 +26,22 @@ class InValidatorTest extends TestCase
         $this->assertFalse($validator->validate('3', $error));
         $this->assertEquals('该输入的值是无效的。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [3, ['in', 'range' => [3,4]]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, '3');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1的值是无效的。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值是无效的。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试严格验证模式
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @covers ::validateParam()
      * @covers ::validate()
@@ -60,13 +52,18 @@ class InValidatorTest extends TestCase
         $error = '';
         $this->assertTrue($validator->validate('3', $error));
 
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['3', ['in', 'range' => [3,4], 'strict' => false]],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
     }
 
     /**
+     * 测试 range 属性有效性
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */
@@ -76,6 +73,7 @@ class InValidatorTest extends TestCase
     }
 
     /**
+     * 测试 range 属性有效性
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */
@@ -85,6 +83,7 @@ class InValidatorTest extends TestCase
     }
 
     /**
+     * 测试 range 属性有效性
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */

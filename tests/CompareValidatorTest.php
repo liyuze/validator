@@ -14,22 +14,7 @@ use PHPUnit\Framework\TestCase;
 class CompareValidatorTest extends TestCase
 {
     /**
-     * @var null|Parameters
-     */
-    private $_parameters;
-
-    public function setUp()
-    {
-        $this->_parameters = new Parameters();
-        $this->_parameters->config([
-            'param_1' => [null, ['compare', 'skipIsEmpty' => false]],
-            'param_2' => ['test value', ['compare', 'compareParamName' => 'param_3']],
-            'param_3' => ['test value', ['compare', 'compareValue' => 'test value']],
-            'param_4' => [5, ['compare', 'compareValue' => 3 ,'operator' => '>']],
-        ], true);
-    }
-
-    /**
+     * 测试null值对比
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -41,33 +26,43 @@ class CompareValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1, $error));
         $this->assertEquals('该输入的值必须等于null。', $error);
 
-        $param_name = 'param_1';
-        $parameters = $this->_parameters;
-        $parameters->validate();
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [null, ['compare', 'skipIsEmpty' => false]],
+        ]);
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'string');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_1的值必须等于null。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须等于null。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试两个参数对比
      * @covers ::validateParam()
      * @covers ::validate()
      */
     public function testCompareParam()
     {
-        $param_name = 'param_2';
-        $parameters = $this->_parameters;
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $param_name_2 = 'param_name_2';
+        $parameters->config([
+            $param_name => ['test value', ['compare', 'compareParamName' => $param_name_2]],
+            $param_name_2 => ['test value'],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name,'error value');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_2的值必须等于param_3。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须等于'.$param_name_2.'。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试值对比
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -79,17 +74,22 @@ class CompareValidatorTest extends TestCase
         $this->assertFalse($validator->validate('error data', $error));
         $this->assertEquals('该输入的值必须等于"string"。', $error);
 
-        $param_name = 'param_3';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => ['test value', ['compare', 'compareValue' => 'test value']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 'error data');
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_3的值必须等于"test value"。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须等于"test value"。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试对比操作者
      * @covers ::validateParam()
      * @covers ::validate()
      */
@@ -101,17 +101,22 @@ class CompareValidatorTest extends TestCase
         $this->assertFalse($validator->validate(1, $error));
         $this->assertEquals('该输入的值必须大于3。', $error);
 
-        $param_name = 'param_4';
-        $parameters = $this->_parameters;
+
+        $parameters = new Parameters();
+        $param_name = 'param_name';
+        $parameters->config([
+            $param_name => [5, ['compare', 'compareValue' => 3 ,'operator' => '>']],
+        ]);
         $parameters->validate();
         $this->assertFalse($parameters->hasError($param_name));
         $parameters->setParamsValue($param_name, 1);
         $parameters->validate();
         $this->assertTrue($parameters->hasError($param_name));
-        $this->assertEquals('param_4的值必须大于3。', $parameters->getFirstErrorMessage($param_name));
+        $this->assertEquals($param_name.'的值必须大于3。', $parameters->getFirstErrorMessage($param_name));
     }
 
     /**
+     * 测试对比操作符异常
      * @throws \liyuze\validator\Exceptions\InvalidConfigException
      * @expectedException \liyuze\validator\Exceptions\InvalidConfigException
      */
