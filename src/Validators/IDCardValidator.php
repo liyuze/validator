@@ -5,7 +5,7 @@ namespace liyuze\validator\Validators;
 use liyuze\validator\Exceptions\InvalidConfigException;
 use liyuze\validator\Parameters\Parameter;
 
-class IDCardValidator extends MatchValidator
+class IDCardValidator extends Validator
 {
     /**
      * @var string 验证器名称
@@ -15,7 +15,7 @@ class IDCardValidator extends MatchValidator
     /**
      * @var string 正则表达式
      */
-    public $pattern = '/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/';
+    public $pattern_18 = '/^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/';
     public $pattern_15 = '/^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}$/';
 
     /**
@@ -55,17 +55,16 @@ class IDCardValidator extends MatchValidator
     /**
      * InValidator constructor.
      * @param $config
-     * @throws InvalidConfigException
      */
     public function __construct($config = [])
     {
+        parent::__construct($config);
+
         $this->message == '' && $this->message = '{param_name}的值不是有效的身份证号。';
         $this->messageMin == '' && $this->messageMin = '{param_name}的值不可早于{value}。';
         $this->messageMax == '' && $this->messageMax = '{param_name}的值不可晚于{value}。';
         $this->messageMinAge == '' && $this->messageMinAge = '{param_name}的值不可小于{age}周岁。';
         $this->messageMaxAge == '' && $this->messageMaxAge = '{param_name}的值不可大于{age}周岁。';
-
-        parent::__construct($config);
     }
 
     /**
@@ -78,7 +77,7 @@ class IDCardValidator extends MatchValidator
         $value = $parameter->getValue();
 
         //身份证号校验
-        if (!(preg_match($this->pattern, $value) ||
+        if (!(preg_match($this->pattern_18, $value) ||
             (!$this->mustSecondGeneration && preg_match($this->pattern_15, $value)))) {
             $this->addError($parameter, $this->message);
             return false;
@@ -111,7 +110,7 @@ class IDCardValidator extends MatchValidator
     protected function _validateValue($value)
     {
         //身份证号校验
-        if (!(preg_match($this->pattern, $value) ||
+        if (!(preg_match($this->pattern_18, $value) ||
             (!$this->mustSecondGeneration && preg_match($this->pattern_15, $value))))
             return $this->message;
 

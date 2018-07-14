@@ -3,7 +3,6 @@ namespace liyuze\validator\tests;
 
 use liyuze\validator\Parameters\Parameters;
 use liyuze\validator\Validators\IDCardValidator;
-use liyuze\validator\Validators\MatchValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
