@@ -22,12 +22,16 @@ class ValidatorCreator
         'array'     => '\liyuze\validator\Validators\ArrayValidator',
 
         'datetime'  => '\liyuze\validator\Validators\DatetimeValidator',
-        'date'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => 'date'],
-        'time'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => 'time'],
+        'date'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => DatetimeValidator::TYPE_DATE],
+        'time'      => ['\liyuze\validator\Validators\DatetimeValidator', 'type' => DatetimeValidator::TYPE_TIME],
 
         'email'     => '\liyuze\validator\Validators\EmailValidator',
         'url'       => '\liyuze\validator\Validators\UrlValidator',
         'id_card'   => '\liyuze\validator\Validators\IDCardValidator',
+        'mobile_phone'   => '\liyuze\validator\Validators\MobilePhoneValidator',
+        'phone'     => ['\liyuze\validator\Validators\MobilePhoneValidator', 'type' => MobilePhoneValidator::TYPE_PHONE],
+        'mobile'    => ['\liyuze\validator\Validators\MobilePhoneValidator', 'type' => MobilePhoneValidator::TYPE_MOBILE],
+
         'file'      => '\liyuze\validator\Validators\FileValidator',
         'image'     => '\liyuze\validator\Validators\ImageValidator',
         'upload_file'  => '\liyuze\validator\Validators\UploadFileValidator',
