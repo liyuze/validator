@@ -1,10 +1,6 @@
 <?php
 namespace liyuze\validator\tests;
 
-use liyuze\validator\Exceptions\InvalidArgumentException;
-use liyuze\validator\Exceptions\InvalidConfigException;
-use liyuze\validator\Parameters\Parameter;
-use liyuze\validator\Parameters\Parameters;
 use liyuze\validator\Validators\BooleanValidator;
 use liyuze\validator\Validators\CallableValidator;
 use liyuze\validator\Validators\Validator;
@@ -12,7 +8,7 @@ use liyuze\validator\Validators\ValidatorCreator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Class EmailValidatorTest
+ * Class ValidatorCreatorTest
  * @package liyuze\tests
  * @coversDefaultClass \liyuze\validator\Validators\ValidatorCreator
  */
