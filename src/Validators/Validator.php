@@ -21,11 +21,6 @@ abstract class Validator
     protected $_validateStatus = self::VALIDATE_STATUS_WAITING;
 
     /**
-     * @var bool 已有验证错误时，是否直接跳过验证。默认是 true。
-     */
-    public $skipHasError = true;
-
-    /**
      * @var bool 当值为空时是否跳过验证，默认是 true
      * 可以通过配置 isEmpty 属性来实现自定义为空的验证方法。
      */
@@ -125,11 +120,6 @@ abstract class Validator
         if ($this->skipIsEmpty && $this->isEmpty($parameter->getValue())) {
             //设置验证状态
             $this->updateValidateStatus(self::VALIDATE_STATUS_DONE);
-            return true;
-        }
-
-        //有验证错误时跳过其他验证。
-        if ($this->skipHasError && $parameter->getParameters()->hasError()) {
             return true;
         }
 

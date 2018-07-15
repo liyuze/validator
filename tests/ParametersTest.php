@@ -318,7 +318,7 @@ class ParametersTest extends TestCase
 
         $ps2->setValidatorConfig([
             'param_1' => 'boolean',
-            'param_2' => ['number', 'min' => 5, 'skipHasError' => false],
+            'param_2' => ['number', 'min' => 5],
         ]);
         $ps2->validate();
         $this->assertTrue($ps2->hasError('param_1'));

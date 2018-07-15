@@ -39,9 +39,6 @@ class ValidatorTest extends TestCase
      */
     public function testSet()
     {
-        $this->validator->skipHasError = false;
-        $this->assertFalse($this->validator->skipHasError);
-
         $this->validator->someString = false;
         $this->assertFalse(property_exists($this->validator, 'someString'));
 
