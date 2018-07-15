@@ -16,8 +16,6 @@ class CreatorTest extends TestCase
 {
     use ReflectionTrait;
 
-
-
     /**
      * @covers ::parseValidatorConfig()
      */
@@ -43,6 +41,18 @@ class CreatorTest extends TestCase
         $config = 'string|maxLength=150|number|mustInt=1';
         $parseConfig = $this->callPrivateMethod($Creator, 'parseValidatorConfig', [$config]);
         $this->assertSame([['string', 'maxLength' => '150'], ['number', 'mustInt' => '1']], $parseConfig);
+    }
+
+    public function testDefaultValidator()
+    {
+        $creator = new Creator();
+        $param_name = 'param_name';
+        $creator->defaultValidateConfig = [
+            $param_name => 'string|maxLength=3'
+        ];
+        $Parameters = $creator->createParameters([$param_name => '55555']);
+        $Parameters->validate();
+        $this->assertEquals($param_name.'的字符串长度不能大于3。' , $Parameters->getFirstErrorMessage('param_name'));
     }
 
     /**

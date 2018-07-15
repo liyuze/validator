@@ -54,9 +54,14 @@ trait CreatorTrait
     public $validator = [];
 
     /**
+     * @var array 默认的参数验证配置
+     */
+    public $defaultValidateConfig = [];
+
+    /**
      * 创建参数集对象
      * @param array $params
-     * @return mixed
+     * @return Parameters
      */
     public function createParameters($params = [])
     {

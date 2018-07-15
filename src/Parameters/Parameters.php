@@ -3,6 +3,7 @@
 namespace liyuze\validator\Parameters;
 use liyuze\validator\Common\CreatorTrait;
 use liyuze\validator\Creator;
+use liyuze\validator\ValidatorComponent;
 
 /**
  * 参数集
@@ -36,12 +37,17 @@ class Parameters
     public $validateAllParams = false;
 
     /**
+     * @var bool 加载默认的验证器
+     */
+    public $defaultValidate = true;
+
+    /**
      * Parameters constructor.
      * @param array $params 参数列表
-     * @param CreatorTrait|null $Creator 创建器
+     * @param Creator|ValidatorComponent|null $Creator 创建器
      * 格式：[参数名 => 参数值]
      */
-    public function __construct($params = [], CreatorTrait $Creator = null)
+    public function __construct($params = [], $Creator = null)
     {
         if (!empty($params))
             $this->addParams($params);
@@ -224,6 +230,8 @@ class Parameters
     /**
      * @param string $param_name
      * @param mixed $validator_config
+     * @throws \liyuze\validator\Exceptions\InvalidArgumentException
+     * @throws \liyuze\validator\Exceptions\InvalidConfigException
      */
     public function addValidator($param_name, $validator_config)
     {
@@ -238,9 +246,13 @@ class Parameters
 
     /**
      * 验证参数
+     * @throws \liyuze\validator\Exceptions\InvalidArgumentException
+     * @throws \liyuze\validator\Exceptions\InvalidConfigException
      */
     public function validate()
     {
+        $this->beforeValidate();
+
         //进行验证
         foreach ($this->_parameters as $parameter) {
             $parameter->validate();
@@ -251,6 +263,25 @@ class Parameters
         }
 
         return !$this->hasError();
+    }
+
+    /**
+     * @throws \liyuze\validator\Exceptions\InvalidArgumentException
+     * @throws \liyuze\validator\Exceptions\InvalidConfigException
+     */
+    public function beforeValidate()
+    {
+        //加载默认验证器
+        if ($this->defaultValidate === true) {
+            $defaultValidateConfig = $this->_creator->defaultValidateConfig;
+            if (!empty($defaultValidateConfig)) {
+                foreach($this->_parameters as $param_name => $Parameter) {
+                   if (key_exists($param_name, $defaultValidateConfig)) {
+                       $this->addValidator($param_name, $defaultValidateConfig[$param_name]);
+                   }
+                }
+            }
+        }
     }
 
     //endregion
