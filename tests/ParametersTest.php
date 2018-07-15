@@ -294,6 +294,10 @@ class ParametersTest extends TestCase
         $config = [['string', 'maxLength' => 150], ['number', 'mustInt' => true]];
         $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
         $this->assertSame([['string', 'maxLength' => 150], ['number', 'mustInt' => true]], $parseConfig);
+
+        $config = 'string|maxLength=150|number|mustInt=1';
+        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
+        $this->assertSame([['string', 'maxLength' => '150'], ['number', 'mustInt' => '1']], $parseConfig);
     }
 
     /**

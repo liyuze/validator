@@ -223,6 +223,7 @@ class Parameters
      * 例：
      * //字符串格式
      * ’required'
+     * 'string|maxLength=150|number|mustInt=1'
      * //数组格式
      * ['required']
      *
@@ -236,11 +237,28 @@ class Parameters
     private function parseValidatorConfig($data)
     {
         $validators_config = [];
-        //单个验证器
         if (is_string($data)) {
-            $validators_config[] = [$data];
+            //多个验证器或有验证属性
+            /**
+             * 将：'string|maxLength=150|number|mustInt=1'
+             * 解析为：['string', 'maxLength' => 150, 'number', 'mustInt' => true]
+             */
+            if(strpos($data, '|') > 0) {
+                $temp = explode('|', $data);
+                $data = [];
+                foreach ($temp as $k => $v) {
+                    if (strpos($v, '=') > 0) {
+                        list($key, $value) = explode('=', $v);
+                        $data[$key] = $value;
+                    } else
+                        $data[] = $v;
+                }
 
-        //多个验证器
+                $validators_config = $this->parseValidatorConfig($data);
+            } else {
+                $validators_config[] = [$data];
+            }
+
         } elseif (is_array($data)) {
             $validator_index = -1;
             foreach ($data as $k => $v) {
