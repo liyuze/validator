@@ -152,10 +152,9 @@ class Parameters
     /**
      * 获取指定N个参数的值，不指定返回所有参数的值
      * @param array $params 指定的参数名称
-     * @param bool $hasName 是否包含参数名称,默认true
      * @return array
      */
-    public function getParamsValue(array $params = [], $hasName = true)
+    public function getParamsValue(array $params = [])
     {
         $data = [];
 
@@ -163,8 +162,7 @@ class Parameters
             $params = array_keys($this->_parameters);
 
         foreach ($params as $param_name) {
-            $value = $this->getParamValue($param_name);
-            $hasName ? $data[$param_name] = $value : $data[] = $value;
+            $data[$param_name] = $this->getParamValue($param_name);
         }
 
         return $data;

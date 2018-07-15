@@ -113,8 +113,8 @@ class ParametersTest extends TestCase
      */
     public function testGetParamsValue(Parameters $ps)
     {
-        $value = $ps->getParamsValue(['param_1', 'param_2'], false);
-        $this->assertArraySubset($value, [1,2]);
+        $value = $ps->getParamsValue(['param_2']);
+        $this->assertArraySubset($value, ['param_2' => 2]);
 
         $value = $ps->getParamsValue([]);
         $this->assertArraySubset($value, ['param_1' => 1, 'param_2' => 2]);
