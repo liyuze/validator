@@ -2,7 +2,6 @@
 
 namespace liyuze\validator\Parameters;
 use liyuze\validator\Validators\Validator;
-use liyuze\validator\Validators\ValidatorCreator;
 
 /**
  * 参数
@@ -45,8 +44,6 @@ class Parameter
      * @var void 参数值
      */
     private $_value = null;
-
-    private $_validatorConfig = [];
 
     /**
      * @var array(Validator) 验证器列表
@@ -111,40 +108,13 @@ class Parameter
 
     //endregion
 
-
     //region 验证器相关
 
-    /**
-     * 设置验证器配置
-     * @param array $config
-     *
-     * 例：
-     * [验证规则]
-     *
-     * 验证规则格式如下：
-     * [验证简称 | 匿名函数 | 可调用函数 [, '参数' => ’值, '参数' => ’值]]
-     * 例：
-     * ['required']
-     * ['number', 'max' => 10, 'min' => 1]
-     * [function ($parameters, $param_name){...}]
-     * ['\app\module\UserModel::checkUserName']
-     *
-     */
-    public function setValidatorConfig(array $config)
+    public function addValidators($validators)
     {
-        foreach ($config as $validator_config) {
-            $this->addValidator(ValidatorCreator::create($validator_config[0], array_slice($validator_config, 1)));
-            $this->_validatorConfig[] = $validator_config;
+        foreach ($validators as $v) {
+            $this->addValidator($v);
         }
-    }
-
-    /**
-     * 获取验证规则
-     * @return array
-     */
-    public function getValidatorConfig()
-    {
-        return $this->_validatorConfig;
     }
 
     /**

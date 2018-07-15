@@ -274,37 +274,9 @@ class ParametersTest extends TestCase
 
     /**
      * @param Parameters $ps
-     * @covers ::parseValidatorConfig()
-     * @depends clone testConstruct
-     */
-    public function testParseValidatorConfig(Parameters $ps)
-    {
-        $config = 'string';
-        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame([['string']], $parseConfig);
-
-        $config = ['string'];
-        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame([['string']], $parseConfig);
-
-        $config = ['string', 'maxLength' => 150, 'number', 'mustInt' => true];
-        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame([['string', 'maxLength' => 150], ['number', 'mustInt' => true]], $parseConfig);
-
-        $config = [['string', 'maxLength' => 150], ['number', 'mustInt' => true]];
-        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame([['string', 'maxLength' => 150], ['number', 'mustInt' => true]], $parseConfig);
-
-        $config = 'string|maxLength=150|number|mustInt=1';
-        $parseConfig = $this->callPrivateMethod($ps, 'parseValidatorConfig', [$config]);
-        $this->assertSame([['string', 'maxLength' => '150'], ['number', 'mustInt' => '1']], $parseConfig);
-    }
-
-    /**
-     * @param Parameters $ps
      * @param Parameters $ps2
      * @covers ::addValidator()
-     * @covers ::setValidatorConfig()
+     * @covers ::setRules()
      * @covers ::validate()
      * @depends clone testConstruct
      * @depends clone testAddParam
@@ -316,7 +288,7 @@ class ParametersTest extends TestCase
         $ps->validate();
         $this->assertTrue($ps->hasError('param_1'));
 
-        $ps2->setValidatorConfig([
+        $ps2->setRules([
             'param_1' => 'boolean',
             'param_2' => ['number', 'min' => 5],
         ]);

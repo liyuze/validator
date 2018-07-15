@@ -1,6 +1,8 @@
 <?php
 
 namespace liyuze\validator\Parameters;
+use liyuze\validator\Common\CreatorTrait;
+use liyuze\validator\Creator;
 
 /**
  * 参数集
@@ -11,6 +13,11 @@ namespace liyuze\validator\Parameters;
 class Parameters
 {
     //region 基础
+
+    /**
+     * @var CreatorTrait 创建器
+     */
+    private $_creator;
 
     /**
      * @var array 参数对象数组
@@ -30,13 +37,19 @@ class Parameters
 
     /**
      * Parameters constructor.
-     * @param array $params
+     * @param array $params 参数列表
+     * @param CreatorTrait|null $Creator 创建器
      * 格式：[参数名 => 参数值]
      */
-    public function __construct($params = [])
+    public function __construct($params = [], CreatorTrait $Creator = null)
     {
         if (!empty($params))
             $this->addParams($params);
+
+        if ($Creator === null)
+            $Creator = new Creator();
+
+        $this->_creator = $Creator;
     }
 
     /**
@@ -53,6 +66,12 @@ class Parameters
 
     //region 配置相关
 
+    public function setParams($params){
+        $this->clearParams();
+        $this->addParams($params);
+    }
+    public function setParamRules(){}
+
     /**
      * 参数以及验证规则配置
      * @param array $config 配置
@@ -66,7 +85,7 @@ class Parameters
         foreach ($config as $param_name => $v) {
             list($param_value, $validate_rule, $alias) = array_pad((array)$v, 3, null);
             $this->addParam($param_name, $param_value, $alias);
-            $this->addValidator($param_name, (array)$validate_rule);
+            $this->addValidator($param_name, $validate_rule);
         }
 
         if (isset($validateAllParams))
@@ -182,21 +201,6 @@ class Parameters
 
     //region 验证器相关
 
-    public function addValidator($param_name, $validator_config)
-    {
-        //新增(已存在则跳过)
-        $this->addParam($param_name);
-
-        $validator_config = $this->parseValidatorConfig($validator_config);
-
-        if(empty($validator_config))
-            return;
-
-        $Parameter = $this->getParam($param_name);
-        $Parameter->setValidatorConfig($validator_config);
-    }
-
-
     /**
      * 设置验证器配置
      * @param array $config
@@ -207,9 +211,10 @@ class Parameters
      * [验证器配置]值查看 [[parseValidatorConfig()]] 的注释
      *
      * @see parseValidatorConfig()
+     * @throws \liyuze\validator\Exceptions\InvalidArgumentException
      */
 
-    public function setValidatorConfig(array $config)
+    public function setRules(array $config)
     {
         foreach ($config as $param_name => $validator_config) {
             $this->addValidator($param_name, $validator_config);
@@ -217,73 +222,19 @@ class Parameters
     }
 
     /**
-     * 解析验证器配置
-     * @param string|array $data
-     *
-     * 例：
-     * //字符串格式
-     * ’required'
-     * 'string|maxLength=150|number|mustInt=1'
-     * //数组格式
-     * ['required']
-     *
-     * //多验证器以及验证器配置
-     * ['required','number', 'max' => 10, 'min' => 1]
-     * //或
-     * ['required', ['number', 'max' => 10, 'min' => 1]]
-     *
-     * @return array
+     * @param string $param_name
+     * @param mixed $validator_config
      */
-    private function parseValidatorConfig($data)
+    public function addValidator($param_name, $validator_config)
     {
-        $validators_config = [];
-        if (is_string($data)) {
-            //多个验证器或有验证属性
-            /**
-             * 将：'string|maxLength=150|number|mustInt=1'
-             * 解析为：['string', 'maxLength' => 150, 'number', 'mustInt' => true]
-             */
-            if(strpos($data, '|') > 0) {
-                $temp = explode('|', $data);
-                $data = [];
-                foreach ($temp as $k => $v) {
-                    if (strpos($v, '=') > 0) {
-                        list($key, $value) = explode('=', $v);
-                        $data[$key] = $value;
-                    } else
-                        $data[] = $v;
-                }
+        //新增(已存在则跳过)
+        $this->addParam($param_name);
 
-                $validators_config = $this->parseValidatorConfig($data);
-            } else {
-                $validators_config[] = [$data];
-            }
+        $validators = $this->_creator->createValidators($validator_config);
 
-        } elseif (is_array($data)) {
-            $validator_index = -1;
-            foreach ($data as $k => $v) {
-                if (is_int($k)) {
-                    //验证器
-                    if (is_array($v)) {
-                        $temp_config = $this->parseValidatorConfig($v);
-                        $validator_index += count($temp_config);
-                        $validators_config = array_merge($validators_config, $temp_config);
-                    } else {
-                        $validator_index++;
-                        $validators_config[$validator_index][0] = $v;
-                    }
-                } else {
-                    //参数
-                    $validators_config[$validator_index][$k] = $v;
-                }
-            }
-        } else {
-            //todo 错误配置
-        }
-
-        return $validators_config;
+        $Parameter = $this->getParam($param_name);
+        $Parameter->addValidators($validators);
     }
-
 
     /**
      * 验证参数

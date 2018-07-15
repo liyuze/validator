@@ -110,14 +110,6 @@ class ValidatorTest extends TestCase
         $this->validator->validateParam($parameter);
         $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
         $this->assertEquals(Validator::VALIDATE_STATUS_DONE, $validateStatus);
-
-        //有其他错误时跳过验证
-        $parameter->setValue(11);
-        $parameters->addError('param_9', 'test',
-            '{param_name}的值不能大于{max}', ['max' => 5, 'param_name' => 'param_9']);
-        $this->validator->validateParam($parameter);
-        $validateStatus = $this->getPrivateProperty($this->validator, '_validateStatus');
-        $this->assertEquals(Validator::VALIDATE_STATUS_WAITING, $validateStatus);
     }
 
     /**

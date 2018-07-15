@@ -3,6 +3,8 @@ namespace liyuze\validator\tests;
 
 use liyuze\validator\Parameters\Parameter;
 use liyuze\validator\Parameters\Parameters;
+use liyuze\validator\Validators\BooleanValidator;
+use liyuze\validator\Validators\RequiredValidator;
 use liyuze\validator\Validators\Validator;
 use PHPUnit\Framework\TestCase;
 
@@ -50,34 +52,19 @@ class ParameterTest extends TestCase
 
     /**
      * @param Parameter $p
-     * @depends testConstruct
-     * @covers ::setValidatorConfig()
-     * @covers ::getValidatorConfig()
-     * @return Parameter
-     */
-    public function testSetValidatorConfig(Parameter $p)
-    {
-        $p->setValidatorConfig([['required'],['boolean']]);
-
-        $config = $p->getValidatorConfig();
-        $this->assertSame($config, [['required'],['boolean']]);
-
-        $validators = $this->getPrivateProperty($p, '_validators');
-        if ($validators)
-            $this->assertInstanceOf(Validator::class, $validators[1]);
-
-        return $p;
-    }
-
-    /**
-     * @param Parameter $p
      * @covers ::validate()
      * @covers ::setValue()
      * @covers ::resetValidateStatus()
-     * @depends testSetValidatorConfig
+     * @depends testConstruct
      */
     public function testValidate(Parameter $p)
     {
+        $data = [
+            new RequiredValidator(),
+            new BooleanValidator(),
+        ];
+        $p->addValidators($data);
+
         $p->validate();
         $hasError = $p->getParameters()->hasError($p->getName());
         $this->assertTrue($hasError);
