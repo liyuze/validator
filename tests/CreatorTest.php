@@ -1,6 +1,9 @@
 <?php
 namespace liyuze\validator\tests;
 
+use liyuze\validator\Exceptions\InvalidArgumentException;
+use liyuze\validator\Mounter\Mounter;
+use liyuze\validator\tests\common\IDCardMounter;
 use liyuze\validator\Validators\BooleanValidator;
 use liyuze\validator\Validators\CallableValidator;
 use liyuze\validator\Validators\Validator;
@@ -147,6 +150,72 @@ class CreatorTest extends TestCase
      * 测试所用
      */
     public static function staticMethodForTest(){}
+
+    /**
+     * @covers ::createMounters()
+     * @throws InvalidArgumentException
+     */
+    public function testCreateMounters()
+    {
+        $Creator = new Creator();
+        $param_name = 'param_name';
+        $Creator->mounter = [
+            'id_card' => IDCardMounter::class
+        ];
+        $Parameters = $Creator->createParameters([$param_name => '130423199901011234']);
+        $Parameter = $Parameters->getParam($param_name);
+        $Mounters = $Creator->createMounters($Parameter, 'id_card|minYear=2018|'.IDCardMounter::class);
+        $this->assertEquals(2, count($Mounters));
+        $this->assertEquals(2018, $Mounters[0]->minYear);
+    }
+
+    /**
+     * 短名称
+     * @covers ::_createMounter()
+     * @throws InvalidArgumentException
+     */
+    public function test_CreateMountersShortName()
+    {
+        $Creator = new Creator();
+        $Creator->mounter = ['id_card' => IDCardMounter::class];
+        $param_name = 'param_name';
+        $Parameters = $Creator->createParameters([$param_name => '130423199901011234']);
+        $Parameter = $Parameters->getParam($param_name);
+        $Mounter = $Creator->_createMounter($Parameter, 'id_card', ['minYear' => 2018]);
+
+        $this->assertInstanceOf(Mounter::class, $Mounter);
+        $this->assertEquals(2018, $Mounter->minYear);
+    }
+
+    /**
+     * 类名称
+     * @covers ::_createMounter()
+     * @throws InvalidArgumentException
+     */
+    public function test_CreateMountersClassName()
+    {
+        $Creator = new Creator();
+        $param_name = 'param_name';
+        $Parameters = $Creator->createParameters([$param_name => '130423199901011234']);
+        $Parameter = $Parameters->getParam($param_name);
+        $Mounter = $Creator->_createMounter($Parameter, IDCardMounter::class);
+
+        $this->assertInstanceOf(Mounter::class, $Mounter);
+    }
+
+    /**
+     * 异常
+     * @covers ::_createMounter()
+     * @expectedException liyuze\validator\Exceptions\InvalidArgumentException
+     */
+    public function test_CreateMountersException()
+    {
+        $Creator = new Creator();
+        $param_name = 'param_name';
+        $Parameters = $Creator->createParameters([$param_name => '130423199901011234']);
+        $Parameter = $Parameters->getParam($param_name);
+        $Creator->_createMounter($Parameter, []);
+    }
 
 }
 

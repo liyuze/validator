@@ -3,6 +3,7 @@
 namespace liyuze\validator\Parameters;
 use liyuze\validator\Common\CreatorTrait;
 use liyuze\validator\Creator;
+use liyuze\validator\Exceptions\InvalidArgumentException;
 use liyuze\validator\ValidatorComponent;
 
 /**
@@ -145,10 +146,14 @@ class Parameters
      * 获取某个参数
      * @param string $param_name 参数名
      * @return null|Parameter
+     * @throws InvalidArgumentException
      */
     public function getParam($param_name)
     {
-        return $this->hasParam($param_name) ? $this->_parameters[$param_name] : null;
+        if (!$this->hasParam($param_name))
+            throw new InvalidArgumentException('Invalid param name value.');
+
+        return $this->_parameters[$param_name];
     }
 
     /**
@@ -167,8 +172,10 @@ class Parameters
     public function setParamsValue($param_name, $value)
     {
         if ($this->hasParam($param_name)) {
-            $param = $this->getParam($param_name);
-            $param->setValue($value);
+            try {
+                $param = $this->getParam($param_name);
+                $param->setValue($value);
+            } catch (InvalidArgumentException $e) {}
         } else {
             $this->addParam($param_name, $value);
         }
@@ -384,5 +391,37 @@ class Parameters
 
     //endregion
 
+    //region 挂载
 
+    /**
+     * 添加挂载器
+     * @param string $param_name
+     * @param mixed $mounter_config
+     * @throws \liyuze\validator\Exceptions\InvalidArgumentException
+     */
+    public function addMounter($param_name, $mounter_config)
+    {
+        $Parameter = $this->getParam($param_name);
+
+        $mounters = $this->_creator->createMounters($Parameter, $mounter_config);
+
+        foreach ($mounters as $mounter)
+            $Parameter->addMounter($mounter);
+    }
+
+    /**
+     * 获取参数的挂载值
+     * @param string $param_name 参数名
+     * @param string $mount_name 挂载名称
+     * @param bool $mustLatest 必须获取最新的运算值，默认是 false 有缓存则读取缓存。
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function getMountValue($param_name, $mount_name, $mustLatest = false)
+    {
+        $Parameter = $this->getParam($param_name);
+        return $Parameter->getMountValue($mount_name, $mustLatest);
+    }
+
+    //endregion
 }

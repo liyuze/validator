@@ -3,6 +3,8 @@
 namespace liyuze\validator\Common;
 use liyuze\validator\Exceptions\InvalidArgumentException;
 use liyuze\validator\Exceptions\InvalidConfigException;
+use liyuze\validator\Mounter\Mounter;
+use liyuze\validator\Parameters\Parameter;
 use liyuze\validator\Parameters\Parameters;
 use liyuze\validator\Validators\CallableValidator;
 use liyuze\validator\Validators\DatetimeValidator;
@@ -49,7 +51,7 @@ trait CreatorTrait
     ];
 
     /**
-     * @var array 用户自定义内置（缩写名）验证器
+     * @var array 用户自定义（缩写名）验证器
      */
     public $validator = [];
 
@@ -57,6 +59,17 @@ trait CreatorTrait
      * @var array 默认的参数验证配置
      */
     public $defaultValidateConfig = [];
+
+
+    /**
+     * @var array 用户自定义（缩写名）挂载器
+     */
+    public $mounter = [];
+
+    /**
+     * @var array 默认的参数挂载配置
+     */
+    public $defaultMountConfig = [];
 
     /**
      * 创建参数集对象
@@ -109,7 +122,7 @@ trait CreatorTrait
             } elseif (class_exists($validator)) {
                 $object = new $validator($params);
                 if (!($object instanceof Validator)) {
-                    throw new InvalidArgumentException('');
+                    throw new InvalidArgumentException($validator.' must instance of '.Validator::class);
                 }
                 return $object;
 
@@ -205,5 +218,54 @@ trait CreatorTrait
     public function getValidator()
     {
         return array_merge($this->validator, self::$built_in_validators);
+    }
+
+    /**
+     * @param Parameter $Parameter 参数对象
+     * @param string|array $config 挂载
+     * @return array 挂载器实例数组
+     * @throws InvalidArgumentException
+     */
+    public function createMounters($Parameter, $config)
+    {
+        $config = $this->parseValidatorConfig($config);
+        $mounters = [];
+        foreach ($config as $v) {
+            $mounters[] = $this->_createMounter($Parameter, $v[0], array_slice($v, 1));
+        }
+
+        return $mounters;
+    }
+
+    /**
+     * 实例化挂载器
+     * @param Parameter $Parameter 参数对象
+     * @param string $mounter 挂载器的短名称或类名
+     * @param array $params 参数列表
+     * @return mixed
+     * @throws InvalidArgumentException
+     * @see parseValidatorConfig()
+     */
+    public function _createMounter($Parameter, $mounter, $params = [])
+    {
+        if (is_string($mounter)) {
+            $built_in_mounters = $this->mounter;
+            //内置挂载器
+            if (key_exists($mounter, $built_in_mounters)) {
+                $config = (array)$built_in_mounters[$mounter];
+                $params = array_merge($params, array_slice($config, 1));
+                return new $config[0]($Parameter, $params);
+
+                //自定义挂载器
+            } elseif (class_exists($mounter)) {
+                $object = new $mounter($Parameter, $params);
+                if (!($object instanceof Mounter)) {
+                    throw new InvalidArgumentException($mounter.' must instance of '.Mounter::class);
+                }
+                return $object;
+            }
+        }
+
+        throw new InvalidArgumentException('Invalid mounter value.');
     }
 }

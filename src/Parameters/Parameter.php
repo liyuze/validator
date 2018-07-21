@@ -1,6 +1,8 @@
 <?php
 
 namespace liyuze\validator\Parameters;
+use liyuze\validator\Exceptions\InvalidArgumentException;
+use liyuze\validator\Mounter\Mounter;
 use liyuze\validator\Validators\Validator;
 
 /**
@@ -49,6 +51,16 @@ class Parameter
      * @var array(Validator) 验证器列表
      */
     private $_validators = [];
+
+    /**
+     * @var array(Mounter) 挂载器列表
+     */
+    private $_mounters = [];
+
+    /**
+     * @var array 缓存的挂载器的值列表
+     */
+    private $_mountValueCache = [];
 
 
     //region 参数相关
@@ -110,6 +122,10 @@ class Parameter
 
     //region 验证器相关
 
+    /**
+     * 新增验证器
+     * @param Validator $validators
+     */
     public function addValidators($validators)
     {
         foreach ($validators as $v) {
@@ -149,6 +165,91 @@ class Parameter
              */
             $v->updateValidateStatus(Validator::VALIDATE_STATUS_WAITING);
         }
+    }
+
+    //endregion
+
+    //region 挂载相关
+
+    /**
+     * 新增挂载器
+     * @param Mounter $Mounter
+     * @throws InvalidArgumentException
+     */
+    public function addMounter($Mounter)
+    {
+        $keys = $Mounter->registerKeys();
+
+        if (!is_array($keys) || empty($keys))
+            throw new InvalidArgumentException('Invalid registerKeys() return value.');
+
+        if (!empty(array_intersect($keys, array_keys($this->_mounters))))
+            throw new InvalidArgumentException('Register keys (' . implode(',', $keys) . ') already exists.');
+
+        foreach ($keys as $key) {
+            $this->_mounters[$key] = $Mounter;
+        }
+    }
+
+    /**
+     * @param string $name 挂载名称
+     * @param bool $mustLatest 必须获取最新的运算值，默认是 false 有缓存则读取缓存。
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function getMountValue($name, $mustLatest = false)
+    {
+        //返回缓存值
+        if ($mustLatest === false && key_exists($name, $this->_mountValueCache)) {
+            return $this->_mountValueCache[$name];
+        }
+        //获取关联的挂载器
+        if (!key_exists($name, $this->_mounters))
+            throw new InvalidArgumentException('Invalid mount name value.');
+        /**
+         * @var Mounter
+         */
+        $Mounter = $this->_mounters[$name];
+        //运行挂载器
+        $value = $Mounter->runMount();
+        //校验返回值过滤掉非注册的值
+        $value = $this->checkMountValue($Mounter, $value);
+        //缓存结果
+        if ($Mounter->cache) {
+            $this->setMountValueCache($value);
+        }
+        return $value[$name];
+    }
+
+    /**
+     * 校验挂载的挂载值是否超出注册的列表。
+     * @param Mounter $Mounter
+     * @param array $value
+     * @return array
+     * @throws InvalidArgumentException
+     */
+    private function checkMountValue($Mounter, $value)
+    {
+        if (!is_array($value))
+            throw new InvalidArgumentException('Mount value must be an array.');
+
+        $invalidKeys = array_diff(array_keys($value), $Mounter->registerKeys());
+        if (!empty($invalidKeys)) {
+            foreach ($invalidKeys as $invalidKey) {
+                unset($value[$invalidKey]);
+            }
+        }
+
+        return $value;
+    }
+
+    /**
+     * 缓存挂载器的计算结果
+     * @param array $value
+     */
+    private function setMountValueCache(array $value)
+    {
+        $this->_mountValueCache = array_merge($this->_mountValueCache, $value);
     }
 
     //endregion

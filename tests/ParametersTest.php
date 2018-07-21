@@ -1,6 +1,7 @@
 <?php
 namespace liyuze\validator\tests;
 
+use liyuze\validator\Exceptions\InvalidArgumentException;
 use liyuze\validator\Parameters\Parameter;
 use liyuze\validator\Parameters\Parameters;
 use liyuze\validator\Validators\Validator;
@@ -48,8 +49,8 @@ class ParametersTest extends TestCase
         $p1 = $ps->param_1;
         $this->assertInstanceOf(Parameter::class, $p1);
 
+        $this->expectException(InvalidArgumentException::class);
         $p2 = $ps->getParam('param_2');
-        $this->assertEquals(null, $p2);
     }
 
     /**
@@ -280,6 +281,7 @@ class ParametersTest extends TestCase
      * @covers ::validate()
      * @depends clone testConstruct
      * @depends clone testAddParam
+     * @throws
      */
     public function testValidate(Parameters $ps, Parameters $ps2)
     {
