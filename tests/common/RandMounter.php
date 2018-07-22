@@ -17,7 +17,7 @@ class RandMounter extends Mounter
         return ['rand'];
     }
 
-    public function runMount()
+    public function run()
     {
         return [
             'rand' => rand(1000, 9999)

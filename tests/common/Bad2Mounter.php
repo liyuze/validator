@@ -19,7 +19,7 @@ class Bad2Mounter extends Mounter
         return ['name'];
     }
 
-    public function runMount()
+    public function run()
     {
         return '';
     }

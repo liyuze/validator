@@ -65,5 +65,5 @@ abstract class Mounter
      * 挂载器执行
      * @return array 应返回数组，格式为[挂载的名称=> 挂载值]，挂载的名称必须在 [registerKeys()] 返回的数组中指出。
      */
-    public abstract function runMount();
+    public abstract function run();
 }

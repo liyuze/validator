@@ -2,7 +2,6 @@
 
 namespace liyuze\validator\tests\common;
 
-
 use liyuze\validator\Mounter\Mounter;
 
 class IDCardMounter extends Mounter
@@ -14,7 +13,7 @@ class IDCardMounter extends Mounter
         return ['year', 'tooMin'];
     }
 
-    public function runMount()
+    public function run()
     {
         $value = $this->getParameter()->getValue();
         if (strlen($value) == 18) {

@@ -211,7 +211,7 @@ class Parameter
          */
         $Mounter = $this->_mounters[$name];
         //运行挂载器
-        $value = $Mounter->runMount();
+        $value = $Mounter->run();
         //校验返回值过滤掉非注册的值
         $value = $this->checkMountValue($Mounter, $value);
         //缓存结果
