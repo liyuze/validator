@@ -84,8 +84,10 @@ class Parameter
         if ($reset) {
             //重置验证器的验证状态
             $this->resetValidateStatus();
-            //清楚该参数的错误消息
+            //清除错误消息
             $this->_parameters->clearErrors($this->_name);
+            //清除挂载缓存
+            $this->clearMountValueCache();
         }
         $this->_value = $value;
     }
@@ -250,6 +252,14 @@ class Parameter
     private function setMountValueCache(array $value)
     {
         $this->_mountValueCache = array_merge($this->_mountValueCache, $value);
+    }
+
+    /**
+     * 清除挂载缓存
+     */
+    private function clearMountValueCache()
+    {
+        $this->_mountValueCache = [];
     }
 
     //endregion
