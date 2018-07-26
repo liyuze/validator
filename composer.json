@@ -1,5 +1,5 @@
 {
-    "name":"liyuze/parameter-validator",
+    "name":"liyuze/validator",
     "description": "参数和变量的数据类型和格式验证。",
     "homepage": "https://github.com/liyuze/parameter-validator",
     "type": "library",
@@ -19,6 +19,7 @@
             "email": "290315384@qq.com"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
     },
     "require-dev": {

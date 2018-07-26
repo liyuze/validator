@@ -7,7 +7,7 @@ PHP 语言的参数验证器和挂载器。
 //file:compose.json
 {
     "require": {
-        "liyuze/validator": "dev-master"
+        "liyuze/parameter-validator": "dev-master"
     }
 }
 ```
@@ -20,12 +20,12 @@ compose update
 或
 
 ```bash
-compose install liyuze/validator dev-master
+compose require liyuze/parameter-validator dev-master
 ```
 
 # 示例
 
-### 参数集合对象初始化
+## 参数集合对象初始化
 
 1. 单一指定
 
@@ -45,9 +45,9 @@ compose install liyuze/validator dev-master
    ```
 
    
-###验证器
+## 验证器
 
-#### 验证规则设置
+### 验证规则设置
 
 1. 设置验证规则
 
@@ -75,7 +75,7 @@ compose install liyuze/validator dev-master
 
 
 
-#### 验证和验证消息
+### 验证和验证消息
 
 ```php
 if ($Parameters->validate()) {
@@ -86,15 +86,15 @@ if ($Parameters->validate()) {
 
 
 
-#### 验证消息
+### 验证消息
 
 
 
 
 
-#### 挂载器
+## 挂载器
 
-#### 新增自定义挂载器
+### 新增自定义挂载器
 
 ```php
 /**
@@ -126,13 +126,13 @@ class AgeMounter extends liyuze\validator\Mounter\Mounter {
 
 
 
-#### 挂载器配置
+### 挂载器配置
 
 ```php
 $Parameters->addMounter('age', 'mounter\AgeMounter')
 ```
 
-#### 获取挂载值
+### 获取挂载值
 
 ```php
 //获取出生年份
