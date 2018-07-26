@@ -163,7 +163,13 @@ class ValidatorTest extends TestCase
     public function testAddError()
     {
         $param_name = 'param_1';
-        $parameters = new Parameters([$param_name => 1]);
+        $param_name_2 = 'param_2';
+        $param_nickname_2 = '参数2';
+        $parameters = new Parameters([
+            $param_name => 1,
+            $param_name_2 => [2, $param_nickname_2],
+            ]);
+
         $parameter  = $parameters->getParam($param_name);
         $this->callPrivateMethod($this->validator, 'addError', [
             $parameter,
@@ -171,8 +177,17 @@ class ValidatorTest extends TestCase
             ['max' => 5],
             'test']);
 
+        $parameter_2  = $parameters->getParam($param_name_2);
+        $this->callPrivateMethod($this->validator, 'addError', [
+            $parameter_2,
+            '{param_name}的值不能大于{max}',
+            ['max' => 5],
+            'test2']);
 
         $this->assertTrue($parameters->hasError($param_name));
         $this->assertEquals($param_name.'的值不能大于5', $parameters->getFirstErrorMessage($param_name));
+
+        $this->assertTrue($parameters->hasError($param_name_2));
+        $this->assertEquals($param_nickname_2.'的值不能大于5', $parameters->getFirstErrorMessage($param_name_2));
     }
 }

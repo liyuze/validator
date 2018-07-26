@@ -305,7 +305,6 @@ class Parameters
      */
     public function addError($param_name, $validate_name, $error_template, $params = [])
     {
-        $params['param_name'] = $param_name;
         $keywords = [];
         foreach ($params as $keyword => $value) {
             $keywords['{'.$keyword.'}'] = $value;

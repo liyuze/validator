@@ -196,6 +196,7 @@ abstract class Validator
     public function addError(Parameter $parameter, $error_template, $params = [], $validate_name = null )
     {
         $validate_name = $validate_name === null ? $this->_name : $this->_name.'-'.$validate_name;
+        $params['param_name'] = $parameter->getAliasOrName();
         $parameter->getParameters()->addError($parameter->getName(), $validate_name, $error_template, $params);
     }
 }
