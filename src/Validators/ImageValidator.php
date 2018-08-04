@@ -44,13 +44,11 @@ class ImageValidator extends FileValidator
     {
         parent::__construct($config);
 
-        self::$_allMimeTypes = require __DIR__.'mimeTypes.php';
-
-        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}的值不是一张图片文件。';
-        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}图片宽度不能小于{min_width}。';
-        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}图片宽度不能超过{max_width}。';
-        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}图片高度不都小于{min_height}。';
-        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}图片高度不能超过{max_height}。';
+        $this->messageNotImage == '' && $this->messageNotImage = '{param_name}的值不是图片文件。';
+        $this->messageMinWidth == '' && $this->messageMinWidth = '{param_name}的图片宽度不能小于{min_width}。';
+        $this->messageMaxWidth == '' && $this->messageMaxWidth = '{param_name}的图片宽度不能大于{max_width}。';
+        $this->messageMinHeight == '' && $this->messageMinHeight  = '{param_name}的图片高度不能小于{min_height}。';
+        $this->messageMaxHeight == '' && $this->messageMaxHeight  = '{param_name}的图片高度不能大于{max_height}。';
     }
 
     /**
@@ -73,14 +71,18 @@ class ImageValidator extends FileValidator
 
             //图片尺寸验证
             if ($this->minWidth !== null && $width < $this->minWidth)
-                $this->addError($parameter, $this->messageMinWidth, ['min_width' => $this->minWidth], 'min_width');
+                $this->addError($parameter, $this->messageMinWidth, ['min_width' => $this->minWidth, 'width' => $width],
+                    'min_width');
             elseif ($this->maxWidth !== null && $width > $this->maxWidth)
-                $this->addError($parameter, $this->messageMaxWidth, ['max_width' => $this->maxWidth], 'max_width');
+                $this->addError($parameter, $this->messageMaxWidth, ['max_width' => $this->maxWidth, 'width' => $width],
+                    'max_width');
 
             if ($this->minHeight !== null && $height < $this->minHeight)
-                $this->addError($parameter, $this->messageMinHeight, ['min_height' => $this->minHeight], 'min_height');
+                $this->addError($parameter, $this->messageMinHeight, ['min_height' => $this->minHeight, 'height' => $height],
+                    'min_height');
             elseif ($this->maxHeight !== null && $height > $this->maxHeight)
-                $this->addError($parameter, $this->messageMaxHeight, ['max_height' => $this->maxHeight], 'max_height');
+                $this->addError($parameter, $this->messageMaxHeight, ['max_height' => $this->maxHeight, 'height' => $height],
+                    'max_height');
         }
 
         return true;
@@ -94,7 +96,8 @@ class ImageValidator extends FileValidator
      */
     protected function _validateValue($value)
     {
-        if (parent::validateValue($value) === true) {
+        $result = parent::_validateValue($value);
+        if ($result === true) {
             //图片验证
             if (false === ($imageInfo = getimagesize($value))) {
                 return $this->messageNotImage;
@@ -103,14 +106,16 @@ class ImageValidator extends FileValidator
 
             //图片尺寸验证
             if ($this->minWidth !== null && $width < $this->minWidth)
-                return [$this->messageMinWidth, ['min_width' => $this->minWidth]];
+                return [$this->messageMinWidth, ['min_width' => $this->minWidth, 'width' => $width]];
             elseif ($this->maxWidth !== null && $width > $this->maxWidth)
-                return [$this->messageMaxWidth, ['max_width' => $this->maxWidth]];
+                return [$this->messageMaxWidth, ['max_width' => $this->maxWidth, 'width' => $width]];
 
             if ($this->minHeight !== null && $height < $this->minHeight)
-                return [$this->messageMinHeight, ['min_height' => $this->minHeight]];
+                return [$this->messageMinHeight, ['min_height' => $this->minHeight, 'height' => $height]];
             elseif ($this->maxHeight !== null && $height > $this->maxHeight)
-                return [$this->messageMaxHeight, ['max_height' => $this->maxHeight]];
+                return [$this->messageMaxHeight, ['max_height' => $this->maxHeight, 'height' => $height]];
+        } else {
+            return $result;
         }
 
         return true;

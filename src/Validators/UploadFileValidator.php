@@ -97,9 +97,9 @@ class UploadFileValidator extends Validator
 
         //上传文件数
         $files_num = self::getFilesNum($value);
-        if ($this->minFiles !== null && $files_num < $this->minFiles)
+        if ($this->minFiles > 0 && $files_num < $this->minFiles)
             $this->addError($parameter, $this->messageMinFiles, ['min_files' => $this->minFiles], 'min_files');
-        elseif ($this->maxFiles !== null && $files_num > $this->maxFiles)
+        elseif ($this->maxFiles > 0 && $files_num > $this->maxFiles)
             $this->addError($parameter, $this->messageMaxFiles, ['max_files' => $this->maxFiles], 'max_files');
 
         if (self::isMultipleFiles($value)) {    //多上传文件
@@ -150,7 +150,7 @@ class UploadFileValidator extends Validator
         if ($this->_extensions !== null && !$this->checkExtensions($name)) {
             $has_error = true;
             $this->addError($parameter, $this->messageExtensions,
-                ['extensions' => implode(',', $this->_extensions), ['file_name' => $name]], 'extension');
+                ['extensions' => implode(',', $this->_extensions), 'file_name' => $name], 'extension');
         }
 
         //mimeType 验证
@@ -163,28 +163,30 @@ class UploadFileValidator extends Validator
         //文件大小验证
         if ($this->minSize !== null && $size < self::parseSize($this->minSize)) {
             $has_error = true;
-            $this->addError($parameter, $this->messageMinSize, ['min_size' => $this->minSize, ['file_name' => $name]], 'min_size');
+            $this->addError($parameter, $this->messageMinSize, ['min_size' => $this->minSize, 'file_name' => $name], 'min_size');
         } elseif ($this->maxSize !== null && $size > self::parseSize($this->maxSize)) {
             $has_error = true;
-            $this->addError($parameter, $this->messageMaxSize, ['max_size' => $this->maxSize, ['file_name' => $name]], 'max_size');
+            $this->addError($parameter, $this->messageMaxSize, ['max_size' => $this->maxSize, 'file_name' => $name], 'max_size');
         }
-
         //图片验证
-        if ($this->isImage === true && false === ($imageInfo = getimagesize($tmp_name))) {
+        if ($this->minWidth !== null || $this->minHeight !== null || $this->maxWidth !== null || $this->maxHeight !== null)
+            $this->isImage = true;
+
+        if ($this->isImage == true && false === ($imageInfo = getimagesize($tmp_name))) {
             $this->addError($parameter, $this->messageNotImage, ['file_name' => $name]);
             return false;
         }
         list($width, $height) = $imageInfo;
 
         //图片尺寸验证
-        if ($this->isImage === true && $this->minWidth !== null && $width < $this->minWidth)
+        if ($this->isImage == true && $this->minWidth !== null && $width < $this->minWidth)
             $this->addError($parameter, $this->messageMinWidth, ['min_width' => $this->minWidth, 'file_name' => $name], 'min_width');
-        elseif ($this->isImage === true && $this->maxWidth !== null && $width > $this->maxWidth)
+        elseif ($this->isImage == true && $this->maxWidth !== null && $width > $this->maxWidth)
             $this->addError($parameter, $this->messageMaxWidth, ['max_width' => $this->maxWidth, 'file_name' => $name], 'max_width');
 
-        if ($this->isImage === true && $this->minHeight !== null && $height < $this->minHeight)
+        if ($this->isImage == true && $this->minHeight !== null && $height < $this->minHeight)
             $this->addError($parameter, $this->messageMinHeight, ['min_height' => $this->minHeight, 'file_name' => $name], 'min_height');
-        elseif ($this->isImage === true && $this->maxHeight !== null && $height > $this->maxHeight)
+        elseif ($this->isImage == true && $this->maxHeight !== null && $height > $this->maxHeight)
             $this->addError($parameter, $this->messageMaxHeight, ['max_height' => $this->maxHeight, 'file_name' => $name], 'max_height');
     }
 
@@ -262,20 +264,22 @@ class UploadFileValidator extends Validator
             return [$this->messageMaxSize, ['max_size' => $this->maxSize]];
 
         //图片验证
-        if (false === ($imageInfo = getimagesize($tmp_name))) {
+        if ($this->minWidth !== null || $this->minHeight !== null)
+            $this->isImage = true;
+        if ($this->isImage == true && false === ($imageInfo = getimagesize($tmp_name))) {
             return $this->messageNotImage;
         }
         list($width, $height) = $imageInfo;
 
         //图片尺寸验证
-        if ($this->minWidth !== null && $width < $this->minWidth)
+        if ($this->isImage == true && $this->minWidth !== null && $width < $this->minWidth)
             return [$this->messageMinWidth, ['min_width' => $this->minWidth]];
-        elseif ($this->maxWidth !== null && $width > $this->maxWidth)
+        elseif ($this->isImage == true && $this->maxWidth !== null && $width > $this->maxWidth)
             return [$this->messageMaxWidth, ['max_width' => $this->maxWidth]];
 
-        if ($this->minHeight !== null && $height < $this->minHeight)
+        if ($this->isImage == true && $this->minHeight !== null && $height < $this->minHeight)
             return [$this->messageMinHeight, ['min_height' => $this->minHeight]];
-        elseif ($this->maxHeight !== null && $height > $this->maxHeight)
+        elseif ($this->isImage == true && $this->maxHeight !== null && $height > $this->maxHeight)
             return [$this->messageMaxHeight, ['max_height' => $this->maxHeight]];
 
         return true;

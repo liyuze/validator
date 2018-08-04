@@ -53,13 +53,13 @@ trait FileTrait
      */
     protected function init()
     {
-        self::$_allMimeTypes = require __DIR__.'mimeTypes.php';
+        self::$_allMimeTypes = require __DIR__.'/mimeTypes.php';
 
-        $this->message == '' && $this->message = '{param_name}不是一个文件。';
-        $this->messageMinSize == '' && $this->messageMinSize = '{param_name}文件大小不能低于{min_size}。';
-        $this->messageMaxSize == '' && $this->messageMaxSize = '{param_name}文件大小不能超过{max_size}。';
-        $this->messageExtensions == '' && $this->messageExtensions  = '{param_name}文件只支持以下后缀名：{extensions}。';
-        $this->messageMimeTypes == '' && $this->messageMimeTypes  = '{param_name}文件只支持以下MIME类型：{mime_types}。';
+        $this->message == '' && $this->message = '{param_name}的文件不存在。';
+        $this->messageMinSize == '' && $this->messageMinSize = '{param_name}的文件大小不能小于{min_size}。';
+        $this->messageMaxSize == '' && $this->messageMaxSize = '{param_name}的文件大小不能大于{max_size}。';
+        $this->messageExtensions == '' && $this->messageExtensions  = '{param_name}的文件只支持以下后缀名：{extensions}。';
+        $this->messageMimeTypes == '' && $this->messageMimeTypes  = '{param_name}的文件只支持以下MIME类型：{mime_types}。';
     }
 
     /**
@@ -104,23 +104,23 @@ trait FileTrait
         $str = '';
         $g = floor($size / 1073741824);
         if ($g) {
-            $str .= $g.'Gb';
+            $str .= $g.'GB';
             $size %= 1073741824;
         }
         $m = floor($size / 1048576);
         if ($m) {
-            $str .= $m.'Mb';
+            $str .= $m.'MB';
             $size %= 1048576;
         }
 
         $k = floor($size / 1024);
         if ($k) {
-            $str .= $k.'Kb';
+            $str .= $k.'KB';
             $size %= 1024;
         }
 
         if ($size)
-            $str .= $size;
+            $str .= $size.'B';
 
         return $str;
     }

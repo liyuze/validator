@@ -49,9 +49,9 @@ class FileValidator extends Validator
 
         //文件大小验证
         if ($this->minSize !== null && $size = self::getFileSize($value) < self::parseSize($this->minSize))
-            $this->addError($parameter, $this->messageMinSize, ['min_size' => $this->minSize], 'min_size');
+            $this->addError($parameter, $this->messageMinSize, ['min_size' => $this->minSize, 'size' => $size], 'min_size');
         if ($this->maxSize !== null && $size = self::getFileSize($value) > self::parseSize($this->maxSize))
-            $this->addError($parameter, $this->messageMaxSize, ['max_size' => $this->maxSize], 'max_size');
+            $this->addError($parameter, $this->messageMaxSize, ['max_size' => $this->maxSize, 'size' => $size], 'max_size');
 
         return true;
     }
@@ -81,9 +81,9 @@ class FileValidator extends Validator
 
         //文件大小验证
         if ($this->minSize !== null && $size = self::getFileSize($value) < self::parseSize($this->minSize))
-            return [$this->messageMinSize, ['min_size' => $this->minSize]];
+            return [$this->messageMinSize, ['min_size' => $this->minSize, 'size' => $size]];
         if ($this->maxSize !== null && $size = self::getFileSize($value) > self::parseSize($this->maxSize))
-            return [$this->messageMaxSize, ['max_size' => $this->maxSize]];
+            return [$this->messageMaxSize, ['max_size' => $this->maxSize, 'size' => $size]];
 
         return true;
     }
