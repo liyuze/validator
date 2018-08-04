@@ -57,11 +57,13 @@ trait ReflectionTrait
     protected function callPrivateMethod($Object, $method, $args = [])
     {
         try {
-            $method = new \ReflectionMethod(get_class($Object), $method);
+            $class = is_object($Object) ? get_class($Object) : $Object;
+            $method = new \ReflectionMethod($class, $method);
         } catch (\ReflectionException $e) {
             return false;
         }
         $method->setAccessible(true);
-        return $method->invokeArgs($Object, $args);
+        $class = is_object($Object) ? $Object : null;
+        return $method->invokeArgs($class, $args);
     }
 }
