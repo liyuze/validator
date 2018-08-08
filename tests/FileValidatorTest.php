@@ -93,19 +93,19 @@ class FileValidatorTest extends TestCase
     {
         $size = 1;
         $size_str = $this->callPrivateMethod(FileValidator::class, 'formatSize', [$size]);
-        $this->assertEquals('1', $size_str);
+        $this->assertEquals('1B', $size_str);
         $size = 2048;
         $size_str = $this->callPrivateMethod(FileValidator::class, 'formatSize', [$size]);
-        $this->assertEquals('2K', $size_str);
+        $this->assertEquals('2KB', $size_str);
         $size = 1048576;
         $size_str = $this->callPrivateMethod(FileValidator::class, 'formatSize', [$size]);
-        $this->assertEquals('1M', $size_str);
+        $this->assertEquals('1MB', $size_str);
         $size = 1073741824 * 3;
         $size_str = $this->callPrivateMethod(FileValidator::class, 'formatSize', [$size]);
-        $this->assertEquals('3G', $size_str);
+        $this->assertEquals('3GB', $size_str);
         $size = 1073741824 + 3072;
         $size_str = $this->callPrivateMethod(FileValidator::class, 'formatSize', [$size]);
-        $this->assertEquals('1G3K', $size_str);
+        $this->assertEquals('1GB3KB', $size_str);
     }
 
     public function testParseSize()
@@ -119,7 +119,7 @@ class FileValidatorTest extends TestCase
         $size_str = '1K';
         $size = $this->callPrivateMethod(FileValidator::class, 'parseSize', [$size_str]);
         $this->assertEquals(1024, $size);
-        $size_str = '1';
+        $size_str = '1B';
         $size = $this->callPrivateMethod(FileValidator::class, 'parseSize', [$size_str]);
         $this->assertEquals(1, $size);
 
